@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Xzedesen - Verified Social Network</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* FASTER Animated background elements */
+        .bg-bubbles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .bg-bubbles li {
+            position: absolute;
+            list-style: none;
+            display: block;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            bottom: -160px;
+            animation: square 15s infinite; /* Faster animation: reduced from 25s to 15s */
+            transition-timing-function: linear;
+            border-radius: 50%;
+        }
+        
+        .bg-bubbles li:nth-child(1) {
+            left: 10%;
+            animation-delay: 0s;
+            width: 80px;
+            height: 80px;
+        }
+        
+        .bg-bubbles li:nth-child(2) {
+            left: 20%;
+            animation-delay: 1s; /* Faster animation delay */
+            animation-duration: 12s; /* Faster animation duration */
+            width: 60px;
+            height: 60px;
+        }
+        
+        .bg-bubbles li:nth-child(3) {
+            left: 25%;
+            animation-delay: 2s; /* Faster animation delay */
+            width: 70px;
+            height: 70px;
+        }
+        
+        .bg-bubbles li:nth-child(4) {
+            left: 40%;
+            animation-delay: 0s;
+            animation-duration: 15s; /* Faster animation duration */
+            width: 90px;
+            height: 90px;
+        }
+        
+        .bg-bubbles li:nth-child(5) {
+            left: 70%;
+            width: 50px;
+            height: 50px;
+        }
+        
+        .bg-bubbles li:nth-child(6) {
+            left: 80%;
+            animation-delay: 2s; /* Faster animation delay */
+            width: 60px;
+            height: 60px;
+        }
+        
+        .bg-bubbles li:nth-child(7) {
+            left: 32%;
+            animation-delay: 4s; /* Faster animation delay */
+            width: 75px;
+            height: 75px;
+        }
+        
+        .bg-bubbles li:nth-child(8) {
+            left: 55%;
+            animation-delay: 8s; /* Faster animation delay */
+            animation-duration: 25s; /* Slightly faster animation duration */
+            width: 100px;
+            height: 100px;
+        }
+        
+        .bg-bubbles li:nth-child(9) {
+            left: 25%;
+            animation-delay: 1s; /* Faster animation delay */
+            animation-duration: 25s; /* Slightly faster animation duration */
+            width: 65px;
+            height: 65px;
+        }
+        
+        .bg-bubbles li:nth-child(10) {
+            left: 90%;
+            animation-delay: 7s; /* Faster animation delay */
+            width: 45px;
+            height: 45px;
+        }
+        
+        @keyframes square {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+                border-radius: 50%;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+                border-radius: 20%;
+            }
+        }
+        
+        /* Login container */
+        .login-container {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeIn 0.8s ease-out; /* Faster fade in */
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Logo styling */
+        .logo {
+            margin-bottom: 30px;
+            animation: slideIn 0.6s ease-out; /* Faster logo animation */
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .logo h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        
+        .logo .tagline {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 15px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Form styling */
+        .login-form {
+            text-align: left;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+            animation: formSlide 0.5s ease-out; /* Faster form animation */
+            animation-fill-mode: both;
+        }
+        
+        .form-group:nth-child(1) { animation-delay: 0.2s; }
+        .form-group:nth-child(2) { animation-delay: 0.3s; }
+        
+        @keyframes formSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 16px;
+            color: #fff;
+            transition: all 0.2s ease; /* Faster transition */
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 107, 107, 0.6);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+        }
+        
+        /* Button styling */
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease; /* Faster transition */
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            letter-spacing: 1px;
+            animation: formSlide 0.5s ease-out; /* Faster button animation */
+            animation-fill-mode: both;
+            animation-delay: 0.4s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(255, 107, 107, 0.6);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Additional options */
+        .additional-options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 14px;
+            animation: formSlide 0.5s ease-out; /* Faster options animation */
+            animation-fill-mode: both;
+            animation-delay: 0.5s;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .remember-me input {
+            margin-right: 8px;
+            accent-color: #ff6b6b;
+        }
+        
+        .forgot-password {
+            color: #ff6b6b;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease; /* Faster transition */
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+            color: #ff8e53;
+        }
+        
+        /* Warning section */
+        .warning-section {
+            margin: 30px 0;
+            padding: 15px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            animation: formSlide 0.5s ease-out; /* Faster warning animation */
+            animation-fill-mode: both;
+            animation-delay: 0.6s;
+        }
+        
+        .warning-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff6b6b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .warning-title i {
+            margin-right: 8px;
+        }
+        
+        .warning-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .platform-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .platform-icon {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.6);
+            position: relative;
+            transition: transform 0.3s ease; /* Faster transition */
+        }
+        
+        .platform-icon:hover {
+            transform: scale(1.2); /* Faster hover effect */
+        }
+        
+        .platform-icon::after {
+            content: "✗";
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        /* Sign up section */
+        .signup-section {
+            margin-top: 30px;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            animation: formSlide 0.5s ease-out; /* Faster signup animation */
+            animation-fill-mode: both;
+            animation-delay: 0.7s;
+        }
+        
+        .signup-section a {
+            color: #ff6b6b;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease; /* Faster transition */
+        }
+        
+        .signup-section a:hover {
+            color: #ff8e53;
+            text-decoration: underline;
+        }
+        
+        /* Verification badge */
+        .verification-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.15), rgba(255, 142, 83, 0.15));
+            color: #ff6b6b;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 25px;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            animation: formSlide 0.5s ease-out; /* Faster badge animation */
+            animation-fill-mode: both;
+            animation-delay: 0.8s;
+        }
+        
+        .verification-badge i {
+            margin-right: 8px;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 500px) {
+            .login-container {
+                padding: 30px 20px;
+                margin: 0 15px;
+            }
+            
+            .logo h1 {
+                font-size: 2.5rem;
+            }
+            
+            .logo .tagline {
+                font-size: 1rem;
+            }
+            
+            .additional-options {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background elements -->
+    <ul class="bg-bubbles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+    
+    <div class="login-container">
+        <div class="logo">
+            <h1>xzedesen</h1>
+            <div class="tagline">if you are not here you don't exist</div>
+        </div>
+        
+        <form class="login-form">
+            <div class="form-group">
+                <label for="email">Email or Username</label>
+                <input type="text" id="email" placeholder="Enter your email or username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit" class="login-btn">ACCESS THE VERIFIED REALM</button>
+            
+            <div class="additional-options">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Remember me</label>
+                </div>
+                <a href="#" class="forgot-password">Forgot password?</a>
+            </div>
+        </form>
+        
+        <div class="warning-section">
+            <div class="warning-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                WE CANNOT CONTINUE WITH
+            </div>
+            <div class="warning-text">
+                Other platforms cannot guarantee verified identities. We maintain the highest standard of authenticity with physical Aadhaar verification to ensure no fake profiles.
+            </div>
+            <div class="platform-icons">
+                <div class="platform-icon">
+                    <i class="fab fa-google"></i>
+                </div>
+                <div class="platform-icon">
+                    <i class="fab fa-facebook-f"></i>
+                </div>
+                <div class="platform-icon">
+                    <i class="fab fa-twitter"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="signup-section">
+            <p>Not part of the elite? <a href="#">Apply for verification</a></p>
+        </div>
+        
+        <div class="verification-badge">
+            <i class="fas fa-shield-alt"></i> Aadhaar-verified exclusive community
+        </div>
+    </div>
+
+    <script>
+        // Form validation and animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.login-form');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                if (!email || !password) {
+                    // Add shake animation to empty fields
+                    if (!email) {
+                        document.getElementById('email').style.animation = 'shake 0.3s'; // Faster shake
+                    }
+                    if (!password) {
+                        document.getElementById('password').style.animation = 'shake 0.3s'; // Faster shake
+                    }
+                    
+                    // Remove animation after it completes
+                    setTimeout(() => {
+                        document.getElementById('email').style.animation = '';
+                        document.getElementById('password').style.animation = '';
+                    }, 300); // Faster timeout
+                    
+                    return;
+                }
+                
+                // Simulate successful login with animation
+                const loginBtn = document.querySelector('.login-btn');
+                loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AUTHENTICATING...';
+                loginBtn.style.opacity = '0.8';
+                
+                setTimeout(() => {
+                    loginBtn.innerHTML = '<i class="fas fa-check"></i> ACCESS GRANTED!';
+                    loginBtn.style.background = 'linear-gradient(45deg, #4ecdc4, #42b883)';
+                    
+                    // Redirect after success (simulated)
+                    setTimeout(() => {
+                        alert('Login successful! Welcome to Xzedesen.');
+                        // In a real application: window.location.href = '/dashboard';
+                    }, 800); // Faster timeout
+                }, 1200); // Faster timeout
+            });
+        });
+        
+        // Add keyframe animation for shake effect
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                20%, 60% { transform: translateX(-8px); }
+                40%, 80% { transform: translateX(8px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
