@@ -58,7 +58,16 @@
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    h2 { margin-bottom: 20px; }
+    /* Gradient heading like xzedesen */
+    h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #ff6b6b, #ff8e53, #ff6b6b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
+      margin-bottom: 25px;
+    }
 
     .form-group { margin-bottom: 20px; text-align: left; }
     .form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
@@ -67,7 +76,10 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
       background: rgba(255, 255, 255, 0.07);
       color: #fff; font-size: 14px;
+      appearance: none;
     }
+    .form-group select option { background: #16213e; color: white; }
+
     .form-group input::placeholder { color: rgba(255, 255, 255, 0.5); }
 
     #username-status { margin-top: 5px; font-size: 14px; }
@@ -83,7 +95,19 @@
     button:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(255, 107, 107, 0.6); }
     button:active { transform: translateY(0); }
 
-    @keyframes shake { 0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-8px);}40%,80%{transform:translateX(8px);} }
+    /* Back to login link */
+    .back-login {
+      margin-top: 15px;
+      display: inline-block;
+      color: #ff6b6b;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .back-login:hover {
+      color: #ff8e53;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -145,15 +169,17 @@
 
       <button type="submit">Submit</button>
     </form>
+
+    <!-- Back to login -->
+    <a href="index.html" class="back-login"><i class="fas fa-arrow-left"></i> Back to Login</a>
   </div>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase script same as pehle -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyDEBKGAsMF8woHBpOY5OK4isHGA_anAEPs",
       authDomain: "xzedesen-916ea.firebaseapp.com",
@@ -167,17 +193,12 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // Gender → show other input
     document.getElementById("gender").addEventListener("change", function() {
       const otherGender = document.getElementById("other-gender");
-      if (this.value === "Other") {
-        otherGender.style.display = "block"; otherGender.required = true;
-      } else {
-        otherGender.style.display = "none"; otherGender.required = false;
-      }
+      if (this.value === "Other") { otherGender.style.display = "block"; otherGender.required = true; }
+      else { otherGender.style.display = "none"; otherGender.required = false; }
     });
 
-    // Username availability check
     document.getElementById("username").addEventListener("blur", async () => {
       let rawUsername = document.getElementById("username").value.toLowerCase();
       if (!rawUsername) return;
@@ -189,10 +210,8 @@
       else { statusDiv.innerText = "✅ Username available"; statusDiv.style.color = "lightgreen"; }
     });
 
-    // Form submit
     document.getElementById("signupForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-
       let rawUsername = document.getElementById("username").value.toLowerCase();
       let username = rawUsername + "@xzedesen.com";
       let name = document.getElementById("name").value;
@@ -204,49 +223,39 @@
       if (city === "Other") city = document.getElementById("other-location").value;
       let location = state + (city ? ", " + city : "");
       let file = document.getElementById("photo").files[0];
-
       if (!file) { alert("❌ Please upload a photo."); return; }
 
       try {
         const storageRef = ref(storage, "user_photos/" + username + ".jpg");
         await uploadBytes(storageRef, file);
         const photoURL = await getDownloadURL(storageRef);
-
         await setDoc(doc(db, "users", username), {
           name, gender, dob, location,
-          photoURL: photoURL,
-          verified: false,
-          createdAt: new Date().toISOString()
+          photoURL: photoURL, verified: false, createdAt: new Date().toISOString()
         });
-
         alert("✅ Details submitted! Wait for admin approval.");
         document.getElementById("signupForm").reset();
         document.getElementById("username-status").innerText = "";
       } catch (err) { alert("❌ Error: " + err.message); }
     });
 
-    // Load states & cities from JSON
     let citiesByState = {};
-    fetch("cities.json")
-      .then(res => res.json())
-      .then(data => {
-        citiesByState = data;
-        const stateDropdown = document.getElementById("state");
-        Object.keys(citiesByState).forEach(state => {
-          const option = document.createElement("option");
-          option.value = state; option.textContent = state;
-          stateDropdown.appendChild(option);
-        });
+    fetch("cities.json").then(res => res.json()).then(data => {
+      citiesByState = data;
+      const stateDropdown = document.getElementById("state");
+      Object.keys(citiesByState).forEach(state => {
+        const option = document.createElement("option");
+        option.value = state; option.textContent = state;
+        stateDropdown.appendChild(option);
       });
+    });
 
-    // State change → load cities
     document.getElementById("state").addEventListener("change", function() {
       const state = this.value;
       const cityDropdown = document.getElementById("city");
       const cityGroup = document.getElementById("city-group");
       const otherBox = document.getElementById("other-location");
       cityDropdown.innerHTML = "";
-
       if (state && citiesByState[state]) {
         cityGroup.style.display = "block"; otherBox.style.display = "none";
         citiesByState[state].forEach(city => {
@@ -254,7 +263,6 @@
           option.value = city; option.textContent = city;
           cityDropdown.appendChild(option);
         });
-        // add "Other" option
         const otherOption = document.createElement("option");
         otherOption.value = "Other"; otherOption.textContent = "Other";
         cityDropdown.appendChild(otherOption);
@@ -263,14 +271,10 @@
       }
     });
 
-    // City change → show text box if Other
     document.getElementById("city").addEventListener("change", function() {
       const otherBox = document.getElementById("other-location");
-      if (this.value === "Other") {
-        otherBox.style.display = "block"; otherBox.required = true;
-      } else {
-        otherBox.style.display = "none"; otherBox.required = false;
-      }
+      if (this.value === "Other") { otherBox.style.display = "block"; otherBox.required = true; }
+      else { otherBox.style.display = "none"; otherBox.required = false; }
     });
   </script>
 </body>
