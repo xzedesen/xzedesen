@@ -4,67 +4,94 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Xzedesen Signup</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
     body {
       background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-      font-family: Arial, sans-serif;
-      color: white;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
+      color: #fff;
+      overflow: hidden;
+      position: relative;
     }
+
+    /* Background bubbles */
+    .bg-bubbles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    .bg-bubbles li {
+      position: absolute; list-style: none; display: block; width: 40px; height: 40px;
+      background-color: rgba(255, 255, 255, 0.1);
+      bottom: -160px; animation: square 20s infinite; border-radius: 50%;
+    }
+    .bg-bubbles li:nth-child(1) { left: 10%; width: 80px; height: 80px; }
+    .bg-bubbles li:nth-child(2) { left: 20%; animation-delay: 2s; width: 60px; height: 60px; }
+    .bg-bubbles li:nth-child(3) { left: 25%; animation-delay: 4s; width: 100px; height: 100px; }
+    .bg-bubbles li:nth-child(4) { left: 40%; animation-delay: 3s; width: 70px; height: 70px; }
+    .bg-bubbles li:nth-child(5) { left: 70%; width: 50px; height: 50px; }
+    .bg-bubbles li:nth-child(6) { left: 80%; animation-delay: 6s; width: 60px; height: 60px; }
+    .bg-bubbles li:nth-child(7) { left: 32%; animation-delay: 8s; width: 75px; height: 75px; }
+    .bg-bubbles li:nth-child(8) { left: 55%; animation-delay: 5s; width: 90px; height: 90px; }
+    .bg-bubbles li:nth-child(9) { left: 25%; animation-delay: 7s; width: 65px; height: 65px; }
+    .bg-bubbles li:nth-child(10) { left: 90%; animation-delay: 9s; width: 45px; height: 45px; }
+
+    @keyframes square {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; }
+    }
+
+    /* Signup form */
     .signup-container {
       background: rgba(255, 255, 255, 0.08);
-      padding: 30px;
-      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 40px;
       width: 100%;
-      max-width: 420px;
+      max-width: 450px;
       text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.8s ease-out;
     }
-    h2 {
-      margin-bottom: 20px;
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    h2 { margin-bottom: 20px; }
+
+    .form-group { margin-bottom: 20px; text-align: left; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 12px; border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.07);
+      color: #fff; font-size: 14px;
     }
-    .form-group {
-      margin-bottom: 18px;
-      text-align: left;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
-    .form-group input, 
-    .form-group select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      outline: none;
-      font-size: 14px;
-    }
-    #username-status {
-      margin-top: 5px;
-      font-size: 14px;
-    }
+    .form-group input::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+    #username-status { margin-top: 5px; font-size: 14px; }
+
     button {
       background: linear-gradient(45deg, #ff6b6b, #ff8e53);
-      color: white;
-      border: none;
-      padding: 12px;
-      width: 100%;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      font-weight: bold;
+      color: white; border: none;
+      padding: 14px; width: 100%;
+      border-radius: 10px; font-size: 16px;
+      cursor: pointer; font-weight: bold;
+      transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
     }
-    button:hover {
-      opacity: 0.9;
-    }
+    button:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(255, 107, 107, 0.6); }
+    button:active { transform: translateY(0); }
+
+    @keyframes shake { 0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-8px);}40%,80%{transform:translateX(8px);} }
   </style>
 </head>
 <body>
+  <ul class="bg-bubbles">
+    <li></li><li></li><li></li><li></li><li></li>
+    <li></li><li></li><li></li><li></li><li></li>
+  </ul>
+
   <div class="signup-container">
     <h2>Signup Form</h2>
     <form id="signupForm">
@@ -79,7 +106,7 @@
         <input id="name" placeholder="Enter your full name" required>
       </div>
 
-      <!-- ✅ Gender Dropdown -->
+      <!-- Gender -->
       <div class="form-group">
         <label for="gender">Gender</label>
         <select id="gender" required>
@@ -108,7 +135,8 @@
         <select id="city"></select>
       </div>
 
-      <input type="text" id="other-location" placeholder="Enter your location" style="display:none; margin-top:10px;">
+      <!-- Other city input -->
+      <input type="text" id="other-location" placeholder="Enter your city" style="display:none; margin-top:10px;">
 
       <div class="form-group">
         <label for="photo">Upload Photo</label>
@@ -125,7 +153,7 @@
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
-    // ✅ Firebase Config
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyDEBKGAsMF8woHBpOY5OK4isHGA_anAEPs",
       authDomain: "xzedesen-916ea.firebaseapp.com",
@@ -139,38 +167,29 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // ✅ Gender select → show input if Other
+    // Gender → show other input
     document.getElementById("gender").addEventListener("change", function() {
       const otherGender = document.getElementById("other-gender");
       if (this.value === "Other") {
-        otherGender.style.display = "block";
-        otherGender.required = true;
+        otherGender.style.display = "block"; otherGender.required = true;
       } else {
-        otherGender.style.display = "none";
-        otherGender.required = false;
+        otherGender.style.display = "none"; otherGender.required = false;
       }
     });
 
-    // ✅ Username availability check
+    // Username availability check
     document.getElementById("username").addEventListener("blur", async () => {
       let rawUsername = document.getElementById("username").value.toLowerCase();
       if (!rawUsername) return;
-
       let username = rawUsername + "@xzedesen.com";
       const userRef = doc(db, "users", username);
       const userSnap = await getDoc(userRef);
-
       const statusDiv = document.getElementById("username-status");
-      if (userSnap.exists()) {
-        statusDiv.innerText = "❌ Username not available";
-        statusDiv.style.color = "red";
-      } else {
-        statusDiv.innerText = "✅ Username available";
-        statusDiv.style.color = "lightgreen";
-      }
+      if (userSnap.exists()) { statusDiv.innerText = "❌ Username not available"; statusDiv.style.color = "red"; }
+      else { statusDiv.innerText = "✅ Username available"; statusDiv.style.color = "lightgreen"; }
     });
 
-    // ✅ Form Submit
+    // Form submit
     document.getElementById("signupForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -178,19 +197,15 @@
       let username = rawUsername + "@xzedesen.com";
       let name = document.getElementById("name").value;
       let gender = document.getElementById("gender").value;
-      if (gender === "Other") {
-        gender = document.getElementById("other-gender").value;
-      }
+      if (gender === "Other") gender = document.getElementById("other-gender").value;
       let dob = document.getElementById("dob").value;
       let state = document.getElementById("state").value;
-      let city = document.getElementById("city").value || document.getElementById("other-location").value;
+      let city = document.getElementById("city").value;
+      if (city === "Other") city = document.getElementById("other-location").value;
       let location = state + (city ? ", " + city : "");
       let file = document.getElementById("photo").files[0];
 
-      if (!file) {
-        alert("❌ Please upload a photo.");
-        return;
-      }
+      if (!file) { alert("❌ Please upload a photo."); return; }
 
       try {
         const storageRef = ref(storage, "user_photos/" + username + ".jpg");
@@ -207,12 +222,10 @@
         alert("✅ Details submitted! Wait for admin approval.");
         document.getElementById("signupForm").reset();
         document.getElementById("username-status").innerText = "";
-      } catch (err) {
-        alert("❌ Error: " + err.message);
-      }
+      } catch (err) { alert("❌ Error: " + err.message); }
     });
 
-    // ✅ Load states & cities from JSON
+    // Load states & cities from JSON
     let citiesByState = {};
     fetch("cities.json")
       .then(res => res.json())
@@ -221,35 +234,42 @@
         const stateDropdown = document.getElementById("state");
         Object.keys(citiesByState).forEach(state => {
           const option = document.createElement("option");
-          option.value = state;
-          option.textContent = state;
+          option.value = state; option.textContent = state;
           stateDropdown.appendChild(option);
         });
       });
 
+    // State change → load cities
     document.getElementById("state").addEventListener("change", function() {
       const state = this.value;
       const cityDropdown = document.getElementById("city");
       const cityGroup = document.getElementById("city-group");
       const otherBox = document.getElementById("other-location");
-
       cityDropdown.innerHTML = "";
 
       if (state && citiesByState[state]) {
-        cityGroup.style.display = "block";
-        otherBox.style.display = "none";
+        cityGroup.style.display = "block"; otherBox.style.display = "none";
         citiesByState[state].forEach(city => {
           const option = document.createElement("option");
-          option.value = city;
-          option.textContent = city;
+          option.value = city; option.textContent = city;
           cityDropdown.appendChild(option);
         });
-      } else if (state === "Other") {
-        cityGroup.style.display = "none";
-        otherBox.style.display = "block";
+        // add "Other" option
+        const otherOption = document.createElement("option");
+        otherOption.value = "Other"; otherOption.textContent = "Other";
+        cityDropdown.appendChild(otherOption);
       } else {
-        cityGroup.style.display = "none";
-        otherBox.style.display = "none";
+        cityGroup.style.display = "none"; otherBox.style.display = "none";
+      }
+    });
+
+    // City change → show text box if Other
+    document.getElementById("city").addEventListener("change", function() {
+      const otherBox = document.getElementById("other-location");
+      if (this.value === "Other") {
+        otherBox.style.display = "block"; otherBox.required = true;
+      } else {
+        otherBox.style.display = "none"; otherBox.required = false;
       }
     });
   </script>
