@@ -418,7 +418,7 @@
       usernamePreview.innerHTML = `
         <div class="availability-status">
           <i class="fas fa-check-circle"></i>
-          <span>Username available! Your email: <strong>${fullUsername}</strong></span>
+          <span>Your username is <strong>${fullUsername}</strong></span>
         </div>
       `;
       usernamePreview.className = "username-preview username-available";
@@ -431,7 +431,7 @@
       usernamePreview.innerHTML = `
         <div class="availability-status">
           <i class="fas fa-times-circle"></i>
-          <span>Username taken! <strong>${fullUsername}</strong> already exists</span>
+          <span>Username already taken! <strong>${fullUsername}</strong> is not available</span>
         </div>
       `;
       usernamePreview.className = "username-preview username-taken";
