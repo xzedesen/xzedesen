@@ -549,7 +549,7 @@
   <div class="camera-modal" id="cameraModal">
     <div class="camera-container">
       <h3>Take a Profile Photo</h3>
-      <video id="cameraVideo" autoplay playsinline></video>
+      <video id="cameraVideo" autoplay playsinline muted></video>
       <canvas id="cameraCanvas" style="display:none;"></canvas>
       <div class="camera-controls">
         <button class="camera-btn capture-btn" id="captureBtn">Capture Photo</button>
@@ -732,18 +732,37 @@
     function openCamera() {
       cameraModal.style.display = 'flex';
       
-      // Access the camera
+      // Access the camera with iPhone Safari support
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+        navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { exact: "user" } // force front camera on iPhone Safari
+          },
+          audio: false
+        })
+        .then(function(mediaStream) {
+          stream = mediaStream;
+          cameraVideo.srcObject = stream;
+          cameraVideo.play().catch(err => console.warn("Autoplay issue:", err));
+        })
+        .catch(function(err) {
+          console.error("Error accessing camera: ", err);
+          // Try again without exact constraint if it fails
+          navigator.mediaDevices.getUserMedia({ 
+            video: true, 
+            audio: false 
+          })
           .then(function(mediaStream) {
             stream = mediaStream;
             cameraVideo.srcObject = stream;
+            cameraVideo.play().catch(err => console.warn("Autoplay issue:", err));
           })
-          .catch(function(err) {
-            console.error("Error accessing camera: ", err);
-            alert("Unable to access camera. Please check permissions.");
+          .catch(function(fallbackErr) {
+            console.error("Fallback camera access failed: ", fallbackErr);
+            alert("Unable to access camera. Please check permissions and try again.");
             closeCameraModal();
           });
+        });
       } else {
         alert("Your browser doesn't support camera access.");
         closeCameraModal();
@@ -892,51 +911,78 @@
     });
 
     // Load states and cities data
-    fetch("https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/states.json")
-      .then(res => res.json())
-      .then(data => {
-        // Filter for US states (you can change this for other countries)
-        const usStates = data.filter(state => state.country_code === "US");
-        
-        usStates.forEach(state => {
-          let opt = document.createElement("option");
-          opt.value = state.name; 
-          opt.textContent = state.name;
-          stateSelect.appendChild(opt);
-        });
-
-        stateSelect.addEventListener("change", () => {
-          citySelect.innerHTML = "<option value=''>Select city</option>";
-          if (stateSelect.value) {
-            // For demo purposes, adding some sample cities
-            const sampleCities = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"];
-            sampleCities.forEach(city => {
+    // Fallback states if API fails
+    const fallbackStates = ["California", "Texas", "Florida", "New York", "Illinois", "Pennsylvania", "Ohio", "Georgia", "North Carolina", "Michigan"];
+    
+    try {
+      fetch("https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/states.json")
+        .then(res => {
+          if (!res.ok) throw new Error('Network response was not ok');
+          return res.json();
+        })
+        .then(data => {
+          // Filter for US states
+          const usStates = data.filter(state => state.country_code === "US");
+          
+          if (usStates.length > 0) {
+            usStates.forEach(state => {
               let opt = document.createElement("option");
-              opt.value = city; 
-              opt.textContent = city;
-              citySelect.appendChild(opt);
+              opt.value = state.name; 
+              opt.textContent = state.name;
+              stateSelect.appendChild(opt);
             });
-            let otherOpt = document.createElement("option");
-            otherOpt.value = "Other"; 
-            otherOpt.textContent = "Other";
-            citySelect.appendChild(otherOpt);
-            cityGroup.style.display = "block";
           } else {
-            cityGroup.style.display = "none";
+            // Use fallback if no states found
+            loadFallbackStates();
           }
+        })
+        .catch(err => {
+          console.error("Error loading states data:", err);
+          loadFallbackStates();
         });
-      })
-      .catch(err => {
-        console.error("Error loading states data:", err);
-        // Fallback if the API fails
-        const fallbackStates = ["California", "Texas", "Florida", "New York", "Illinois"];
-        fallbackStates.forEach(state => {
-          let opt = document.createElement("option");
-          opt.value = state; 
-          opt.textContent = state;
-          stateSelect.appendChild(opt);
-        });
+    } catch (err) {
+      console.error("Error fetching states:", err);
+      loadFallbackStates();
+    }
+
+    function loadFallbackStates() {
+      fallbackStates.forEach(state => {
+        let opt = document.createElement("option");
+        opt.value = state; 
+        opt.textContent = state;
+        stateSelect.appendChild(opt);
       });
+    }
+
+    stateSelect.addEventListener("change", () => {
+      citySelect.innerHTML = "<option value=''>Select city</option>";
+      if (stateSelect.value) {
+        // For demo purposes, adding some sample cities based on state
+        const stateCities = {
+          "California": ["Los Angeles", "San Francisco", "San Diego", "Sacramento", "San Jose"],
+          "Texas": ["Houston", "Dallas", "Austin", "San Antonio", "El Paso"],
+          "Florida": ["Miami", "Orlando", "Tampa", "Jacksonville", "Tallahassee"],
+          "New York": ["New York City", "Buffalo", "Rochester", "Albany", "Syracuse"],
+          "Illinois": ["Chicago", "Springfield", "Peoria", "Rockford", "Naperville"]
+        };
+        
+        const cities = stateCities[stateSelect.value] || ["City 1", "City 2", "City 3"];
+        cities.forEach(city => {
+          let opt = document.createElement("option");
+          opt.value = city; 
+          opt.textContent = city;
+          citySelect.appendChild(opt);
+        });
+        
+        let otherOpt = document.createElement("option");
+        otherOpt.value = "Other"; 
+        otherOpt.textContent = "Other";
+        citySelect.appendChild(otherOpt);
+        cityGroup.style.display = "block";
+      } else {
+        cityGroup.style.display = "none";
+      }
+    });
 
     // Gender handling
     document.getElementById("gender").addEventListener("change", e => {
@@ -954,9 +1000,11 @@
       return "";
     }
 
-    document.getElementById("signupForm").addEventListener("submit", async e=>{
+    // Form submission
+    document.getElementById("signupForm").addEventListener("submit", async e => {
       e.preventDefault();
       
+      // Check if all requirements are met
       if (!isUsernameAvailable) {
         alert("❌ Please choose an available username first.");
         return;
@@ -972,11 +1020,12 @@
         return;
       }
       
+      // Get form values
       let username = document.getElementById("username").value.toLowerCase();
       let fullname = document.getElementById("fullname").value;
       let password = document.getElementById("password").value;
       let gender = document.getElementById("gender").value;
-      if(gender==="Other") gender=document.getElementById("otherGenderBox").value;
+      if(gender === "Other") gender = document.getElementById("otherGenderBox").value;
       let dob = document.getElementById("dob").value;
       let state = stateSelect.value;
       let city = citySelect.value;
@@ -984,14 +1033,14 @@
       // Final validation
       let error = validateUsername(username);
       if(error){
-        document.getElementById("usernameError").textContent=error;
+        document.getElementById("usernameError").textContent = error;
         return;
       }
       
-      username = username+"@xzedesen.com";
+      username = username + "@xzedesen.com";
 
-      try{
-        const ref = doc(db,"users",username);
+      try {
+        const ref = doc(db, "users", username);
         const snap = await getDoc(ref);
         if(snap.exists()){
           alert("❌ Username already taken. Please choose another one.");
@@ -999,28 +1048,40 @@
         }
         
         // Store user data including password and photo
-        await setDoc(ref,{
+        await setDoc(ref, {
           fullname,
-          password, // In a real app, you should hash this before storing
+          password, // Note: In a real app, you should hash this before storing
           gender,
           dob,
           state,
           city,
           photo: userPhoto || null,
-          verified:false,
-          createdAt:new Date().toISOString()
+          verified: false,
+          createdAt: new Date().toISOString()
         });
         
         alert("✅ Submitted for free verification! Wait for admin approval.");
+        
+        // Reset form
         e.target.reset();
-        cityGroup.style.display="none";
+        cityGroup.style.display = "none";
         document.getElementById("otherGenderBox").style.display = "none";
         hideUsernamePreview();
         passwordStrength.style.display = "none";
         photoPreview.style.display = "none";
         defaultIcon.style.display = "block";
         userPhoto = null;
-      }catch(err){alert("❌ Error: "+err.message);}
+        
+      } catch(err) {
+        console.error("Submission error:", err);
+        alert("❌ Error: " + err.message);
+      }
+    });
+
+    // Initialize the form
+    window.addEventListener('load', function() {
+      // Ensure the form is properly initialized
+      console.log('Signup form loaded successfully');
     });
   </script>
 </body>
