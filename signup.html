@@ -1,0 +1,63 @@
+!DOCTYPE html
+html lang=en
+head
+  meta charset=UTF-8
+  meta name=viewport content=width=device-width, initial-scale=1.0
+  titleXzedesen Signuptitle
+head
+body
+  h2Signup Formh2
+  form id=signupForm
+    input id=username placeholder=Choose Username requiredbrbr
+    input id=name placeholder=Full Name requiredbrbr
+    input id=gender placeholder=Gender requiredbrbr
+    input id=dob type=date requiredbrbr
+    input id=location placeholder=Location requiredbrbr
+    button type=submitSubmitbutton
+  form
+
+  script type=module
+     Import Firebase libraries
+    import { initializeApp } from httpswww.gstatic.comfirebasejs10.13.2firebase-app.js;
+    import { getFirestore, doc, setDoc } from httpswww.gstatic.comfirebasejs10.13.2firebase-firestore.js;
+
+     ✅ Your Firebase Config
+    const firebaseConfig = {
+      apiKey AIzaSyDEBKGAsMF8woHBpOY5OK4isHGA_anAEPs,
+      authDomain xzedesen-916ea.firebaseapp.com,
+      projectId xzedesen-916ea,
+      storageBucket xzedesen-916ea.firebasestorage.app,
+      messagingSenderId 1019829731381,
+      appId 11019829731381webe987812821dd660578317c
+    };
+
+     Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+     Save form data
+    document.getElementById(signupForm).addEventListener(submit, async (e) = {
+      e.preventDefault();
+
+      let username = document.getElementById(username).value.toLowerCase() + @xzedesen.com;
+      let name = document.getElementById(name).value;
+      let gender = document.getElementById(gender).value;
+      let dob = document.getElementById(dob).value;
+      let location = document.getElementById(location).value;
+
+      try {
+        await setDoc(doc(db, users, username), {
+          name, gender, dob, location,
+          verified false,
+          createdAt new Date().toISOString()
+        });
+
+        alert(✅ Details submitted! Wait for admin approval.);
+        document.getElementById(signupForm).reset();
+      } catch (err) {
+        alert(❌ Error  + err.message);
+      }
+    });
+  script
+body
+html
