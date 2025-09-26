@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Xzedesen - Verified Social Network</title>
+    <title>Join Now | Xzedesen - Verified Social Network</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Base styling */
         * {
             margin: 0;
             padding: 0;
@@ -136,12 +135,6 @@
         .login-btn:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(255, 107, 107, 0.6); }
         .login-btn:active { transform: translateY(0); }
         
-        .additional-options { display: flex; justify-content: space-between; margin-top: 20px; font-size: 14px; animation: formSlide 0.5s ease-out; animation-fill-mode: both; animation-delay: 0.5s; }
-        .remember-me { display: flex; align-items: center; color: rgba(255, 255, 255, 0.7); }
-        .remember-me input { margin-right: 8px; accent-color: #ff6b6b; }
-        .forgot-password { color: #ff6b6b; text-decoration: none; font-weight: 500; transition: all 0.2s ease; }
-        .forgot-password:hover { text-decoration: underline; color: #ff8e53; }
-        
         .warning-section { margin: 30px 0; padding: 15px; background: rgba(255, 107, 107, 0.1); border-radius: 10px; border: 1px solid rgba(255, 107, 107, 0.3); animation: formSlide 0.5s ease-out; animation-fill-mode: both; animation-delay: 0.6s; }
         .warning-title { display: flex; align-items: center; justify-content: center; color: #ff6b6b; font-weight: 600; margin-bottom: 10px; }
         .warning-title i { margin-right: 8px; }
@@ -162,7 +155,6 @@
             .login-container { padding: 30px 20px; margin: 0 15px; }
             .logo h1 { font-size: 2.5rem; }
             .logo .tagline { font-size: 1rem; }
-            .additional-options { flex-direction: column; gap: 15px; }
         }
     </style>
 </head>
@@ -177,23 +169,18 @@
             <div class="tagline">if you are not here you don't exist</div>
         </div>
         
-        <form class="login-form">
+        <form class="login-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Enter your username" required>
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your full name" required>
             </div>
+            
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
             </div>
-            <button type="submit" class="login-btn">ACCESS THE VERIFIED REALM</button>
-            <div class="additional-options">
-                <div class="remember-me">
-                    <input type="checkbox" id="remember">
-                    <label for="remember">Remember me</label>
-                </div>
-                <a href="#" class="forgot-password">Forgot password?</a>
-            </div>
+            
+            <button type="submit" class="login-btn">JOIN NOW - APPLY FOR VERIFICATION</button>
         </form>
         
         <div class="warning-section">
@@ -207,7 +194,7 @@
         </div>
         
         <div class="signup-section">
-            <p>Not part of the elite? <a href="signup.html">Apply for verification</a></p>
+            <p>Join our exclusive Aadhaar-verified community</p>
         </div>
         
         <div class="verification-badge">
@@ -220,27 +207,30 @@
             const form = document.querySelector('.login-form');
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                if (!username || !password) {
-                    if (!username) { document.getElementById('username').style.animation = 'shake 0.3s'; }
-                    if (!password) { document.getElementById('password').style.animation = 'shake 0.3s'; }
+                const name = document.getElementById('name').value;
+                const phone = document.getElementById('phone').value;
+                
+                if (!name || !phone) {
+                    if (!name) { document.getElementById('name').style.animation = 'shake 0.3s'; }
+                    if (!phone) { document.getElementById('phone').style.animation = 'shake 0.3s'; }
                     setTimeout(() => {
-                        document.getElementById('username').style.animation = '';
-                        document.getElementById('password').style.animation = '';
+                        document.getElementById('name').style.animation = '';
+                        document.getElementById('phone').style.animation = '';
                     }, 300);
                     return;
                 }
+                
                 const loginBtn = document.querySelector('.login-btn');
-                loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AUTHENTICATING...';
+                loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SUBMITTING...';
                 loginBtn.style.opacity = '0.8';
+                
                 setTimeout(() => {
-                    loginBtn.innerHTML = '<i class="fas fa-check"></i> ACCESS GRANTED!';
-                    loginBtn.style.background = 'linear-gradient(45deg, #4ecdc4, #42b883)';
-                    setTimeout(() => { alert('Login successful! Welcome to Xzedesen.'); }, 800);
-                }, 1200);
+                    // Submit the form after animation
+                    form.submit();
+                }, 1500);
             });
         });
+        
         const style = document.createElement('style');
         style.textContent = `@keyframes shake { 0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-8px);}40%,80%{transform:translateX(8px);} }`;
         document.head.appendChild(style);
