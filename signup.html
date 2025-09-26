@@ -240,24 +240,87 @@
       color: rgba(255,255,255,0.5);
     }
     
-    .photo-upload-label {
-      display: inline-block;
-      padding: 10px 20px;
+    .photo-options {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    .photo-option-btn {
+      flex: 1;
+      padding: 10px;
       background: rgba(255,255,255,0.1);
       border-radius: 10px;
       cursor: pointer;
       transition: background 0.3s;
       text-align: center;
-      width: 100%;
-      max-width: 200px;
+      border: none;
+      color: white;
+      font-size: 14px;
     }
     
-    .photo-upload-label:hover {
+    .photo-option-btn:hover {
       background: rgba(255,255,255,0.2);
     }
     
     .photo-upload input[type="file"] {
       display: none;
+    }
+    
+    /* Camera modal styles */
+    .camera-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .camera-container {
+      background: rgba(30, 30, 50, 0.95);
+      border-radius: 16px;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
+    
+    #cameraVideo {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 10px;
+      background: #000;
+    }
+    
+    .camera-controls {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    
+    .camera-btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    .capture-btn {
+      background: linear-gradient(45deg,#ff6b6b,#ff8e53);
+      color: white;
+    }
+    
+    .close-camera {
+      background: rgba(255,255,255,0.1);
+      color: white;
     }
 
     /* Username availability styles */
@@ -394,9 +457,14 @@
           <i class="fas fa-user-circle default-icon"></i>
           <img id="photoPreview" src="" alt="Profile Preview">
         </div>
-        <label for="photo" class="photo-upload-label">
-          <i class="fas fa-camera"></i> Upload Profile Photo
-        </label>
+        <div class="photo-options">
+          <button type="button" class="photo-option-btn" id="uploadPhotoBtn">
+            <i class="fas fa-upload"></i> Upload
+          </button>
+          <button type="button" class="photo-option-btn" id="takePhotoBtn">
+            <i class="fas fa-camera"></i> Take Photo
+          </button>
+        </div>
         <input type="file" id="photo" accept="image/*">
       </div>
 
@@ -471,10 +539,23 @@
         </select>
       </div>
 
-      <button type="submit" class="btn" id="submitBtn">Submit for Verification</button>
+      <button type="submit" class="btn" id="submitBtn">Submit for Free Verification</button>
     </form>
 
     <div class="back-btn"><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Login</a></div>
+  </div>
+
+  <!-- Camera Modal -->
+  <div class="camera-modal" id="cameraModal">
+    <div class="camera-container">
+      <h3>Take a Profile Photo</h3>
+      <video id="cameraVideo" autoplay playsinline></video>
+      <canvas id="cameraCanvas" style="display:none;"></canvas>
+      <div class="camera-controls">
+        <button class="camera-btn capture-btn" id="captureBtn">Capture Photo</button>
+        <button class="camera-btn close-camera" id="closeCamera">Close</button>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -492,7 +573,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Load states from JSON
+    // DOM elements
     const stateSelect = document.getElementById("state");
     const cityGroup = document.getElementById("city-group");
     const citySelect = document.getElementById("city");
@@ -510,12 +591,20 @@
     const photoInput = document.getElementById("photo");
     const photoPreview = document.getElementById("photoPreview");
     const defaultIcon = document.querySelector('.default-icon');
+    const uploadPhotoBtn = document.getElementById("uploadPhotoBtn");
+    const takePhotoBtn = document.getElementById("takePhotoBtn");
+    const cameraModal = document.getElementById("cameraModal");
+    const cameraVideo = document.getElementById("cameraVideo");
+    const cameraCanvas = document.getElementById("cameraCanvas");
+    const captureBtn = document.getElementById("captureBtn");
+    const closeCamera = document.getElementById("closeCamera");
 
     let usernameCheckTimeout;
     let isUsernameAvailable = false;
     let isPasswordStrong = false;
     let isPasswordConfirmed = false;
     let userPhoto = null;
+    let stream = null;
 
     // Password toggle functionality
     passwordToggle.addEventListener('click', function() {
@@ -604,6 +693,10 @@
     }
 
     // Photo upload functionality
+    uploadPhotoBtn.addEventListener('click', function() {
+      photoInput.click();
+    });
+
     photoInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -622,6 +715,71 @@
         reader.readAsDataURL(file);
       }
     });
+
+    // Camera functionality
+    takePhotoBtn.addEventListener('click', function() {
+      openCamera();
+    });
+
+    closeCamera.addEventListener('click', function() {
+      closeCameraModal();
+    });
+
+    captureBtn.addEventListener('click', function() {
+      capturePhoto();
+    });
+
+    function openCamera() {
+      cameraModal.style.display = 'flex';
+      
+      // Access the camera
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+          .then(function(mediaStream) {
+            stream = mediaStream;
+            cameraVideo.srcObject = stream;
+          })
+          .catch(function(err) {
+            console.error("Error accessing camera: ", err);
+            alert("Unable to access camera. Please check permissions.");
+            closeCameraModal();
+          });
+      } else {
+        alert("Your browser doesn't support camera access.");
+        closeCameraModal();
+      }
+    }
+
+    function closeCameraModal() {
+      cameraModal.style.display = 'none';
+      
+      // Stop the camera stream
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+    }
+
+    function capturePhoto() {
+      const context = cameraCanvas.getContext('2d');
+      cameraCanvas.width = cameraVideo.videoWidth;
+      cameraCanvas.height = cameraVideo.videoHeight;
+      
+      // Draw the current video frame to canvas
+      context.drawImage(cameraVideo, 0, 0, cameraCanvas.width, cameraCanvas.height);
+      
+      // Convert canvas to data URL
+      const photoDataUrl = cameraCanvas.toDataURL('image/jpeg', 0.8);
+      
+      // Update preview
+      photoPreview.src = photoDataUrl;
+      photoPreview.style.display = 'block';
+      defaultIcon.style.display = 'none';
+      userPhoto = photoDataUrl;
+      
+      // Close camera
+      closeCameraModal();
+    }
 
     // Username availability check function
     async function checkUsernameAvailability(username) {
@@ -733,25 +891,34 @@
       }
     });
 
-    fetch("cities.json")
+    // Load states and cities data
+    fetch("https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/states.json")
       .then(res => res.json())
       .then(data => {
-        Object.keys(data).forEach(state => {
+        // Filter for US states (you can change this for other countries)
+        const usStates = data.filter(state => state.country_code === "US");
+        
+        usStates.forEach(state => {
           let opt = document.createElement("option");
-          opt.value = state; opt.textContent = state;
+          opt.value = state.name; 
+          opt.textContent = state.name;
           stateSelect.appendChild(opt);
         });
 
         stateSelect.addEventListener("change", () => {
           citySelect.innerHTML = "<option value=''>Select city</option>";
           if (stateSelect.value) {
-            data[stateSelect.value].forEach(city => {
+            // For demo purposes, adding some sample cities
+            const sampleCities = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"];
+            sampleCities.forEach(city => {
               let opt = document.createElement("option");
-              opt.value = city; opt.textContent = city;
+              opt.value = city; 
+              opt.textContent = city;
               citySelect.appendChild(opt);
             });
             let otherOpt = document.createElement("option");
-            otherOpt.value = "Other"; otherOpt.textContent = "Other";
+            otherOpt.value = "Other"; 
+            otherOpt.textContent = "Other";
             citySelect.appendChild(otherOpt);
             cityGroup.style.display = "block";
           } else {
@@ -760,7 +927,15 @@
         });
       })
       .catch(err => {
-        console.error("Error loading cities data:", err);
+        console.error("Error loading states data:", err);
+        // Fallback if the API fails
+        const fallbackStates = ["California", "Texas", "Florida", "New York", "Illinois"];
+        fallbackStates.forEach(state => {
+          let opt = document.createElement("option");
+          opt.value = state; 
+          opt.textContent = state;
+          stateSelect.appendChild(opt);
+        });
       });
 
     // Gender handling
@@ -836,7 +1011,7 @@
           createdAt:new Date().toISOString()
         });
         
-        alert("✅ Submitted! Wait for admin approval.");
+        alert("✅ Submitted for free verification! Wait for admin approval.");
         e.target.reset();
         cityGroup.style.display="none";
         document.getElementById("otherGenderBox").style.display = "none";
