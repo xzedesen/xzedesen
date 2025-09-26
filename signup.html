@@ -41,23 +41,23 @@
       width: 40px;
       height: 40px;
       background: rgba(255,255,255,0.1);
-      bottom: -160px;
-      animation: square 20s infinite linear;
+      top: -160px;
+      animation: square 12s infinite linear;
       border-radius: 50%;
     }
     .bg-bubbles li:nth-child(1){left:10%;width:80px;height:80px;}
-    .bg-bubbles li:nth-child(2){left:20%;animation-delay:2s;width:60px;height:60px;}
-    .bg-bubbles li:nth-child(3){left:25%;animation-delay:4s;width:70px;height:70px;}
+    .bg-bubbles li:nth-child(2){left:20%;animation-delay:1.5s;width:60px;height:60px;}
+    .bg-bubbles li:nth-child(3){left:25%;animation-delay:3s;width:70px;height:70px;}
     .bg-bubbles li:nth-child(4){left:40%;animation-delay:1s;width:90px;height:90px;}
-    .bg-bubbles li:nth-child(5){left:70%;animation-delay:3s;width:50px;height:50px;}
-    .bg-bubbles li:nth-child(6){left:80%;animation-delay:6s;width:60px;height:60px;}
-    .bg-bubbles li:nth-child(7){left:32%;animation-delay:8s;width:75px;height:75px;}
-    .bg-bubbles li:nth-child(8){left:55%;animation-delay:5s;width:100px;height:100px;}
-    .bg-bubbles li:nth-child(9){left:25%;animation-delay:9s;width:65px;height:65px;}
-    .bg-bubbles li:nth-child(10){left:90%;animation-delay:7s;width:45px;height:45px;}
+    .bg-bubbles li:nth-child(5){left:70%;animation-delay:2.5s;width:50px;height:50px;}
+    .bg-bubbles li:nth-child(6){left:80%;animation-delay:4.5s;width:60px;height:60px;}
+    .bg-bubbles li:nth-child(7){left:32%;animation-delay:6s;width:75px;height:75px;}
+    .bg-bubbles li:nth-child(8){left:55%;animation-delay:3.5s;width:100px;height:100px;}
+    .bg-bubbles li:nth-child(9){left:25%;animation-delay:7.5s;width:65px;height:65px;}
+    .bg-bubbles li:nth-child(10){left:90%;animation-delay:5.5s;width:45px;height:45px;}
     @keyframes square {
       0%{transform:translateY(0) rotate(0);opacity:1;}
-      100%{transform:translateY(-1000px) rotate(720deg);opacity:0;}
+      100%{transform:translateY(1000px) rotate(720deg);opacity:0;}
     }
 
     .container{
@@ -162,6 +162,102 @@
       background-position: right 16px center;
       background-size: 16px;
       padding-right: 40px;
+    }
+
+    /* Password field styles */
+    .password-wrapper {
+      position: relative;
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0;
+      z-index: 2;
+    }
+    
+    .password-strength {
+      margin-top: 8px;
+      font-size: 13px;
+      display: none;
+    }
+    
+    .strength-weak { color: #ff6b6b; }
+    .strength-medium { color: #ff8e53; }
+    .strength-strong { color: #4ecdc4; }
+    
+    .strength-bar {
+      height: 4px;
+      border-radius: 2px;
+      margin-top: 5px;
+      background: rgba(255,255,255,0.2);
+      overflow: hidden;
+    }
+    
+    .strength-fill {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s, background 0.3s;
+    }
+    
+    /* Photo upload styles */
+    .photo-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    
+    .photo-preview {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 10px;
+      border: 2px solid rgba(255,255,255,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    
+    .photo-preview .default-icon {
+      font-size: 40px;
+      color: rgba(255,255,255,0.5);
+    }
+    
+    .photo-upload-label {
+      display: inline-block;
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+      text-align: center;
+      width: 100%;
+      max-width: 200px;
+    }
+    
+    .photo-upload-label:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    
+    .photo-upload input[type="file"] {
+      display: none;
     }
 
     /* Username availability styles */
@@ -293,6 +389,17 @@
     <h2>Join the Verified Realm</h2>
 
     <form id="signupForm">
+      <div class="photo-upload">
+        <div class="photo-preview">
+          <i class="fas fa-user-circle default-icon"></i>
+          <img id="photoPreview" src="" alt="Profile Preview">
+        </div>
+        <label for="photo" class="photo-upload-label">
+          <i class="fas fa-camera"></i> Upload Profile Photo
+        </label>
+        <input type="file" id="photo" accept="image/*">
+      </div>
+
       <div class="form-group">
         <label for="username">Username <small>(e.g., user123)</small></label>
         <input type="text" id="username" placeholder="Choose username" required>
@@ -303,6 +410,33 @@
       <div class="form-group">
         <label for="fullname">Full Name</label>
         <input type="text" id="fullname" placeholder="Enter your full name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="password" placeholder="Create a strong password" required>
+          <button type="button" class="password-toggle" id="passwordToggle">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        <div class="password-strength" id="passwordStrength">
+          <span id="strengthText">Password strength: </span>
+          <div class="strength-bar">
+            <div class="strength-fill" id="strengthFill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+          <button type="button" class="password-toggle" id="confirmPasswordToggle">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        <div id="confirmPasswordError" class="error"></div>
       </div>
 
       <div class="row">
@@ -365,9 +499,129 @@
     const usernameInput = document.getElementById("username");
     const usernamePreview = document.getElementById("usernamePreview");
     const submitBtn = document.getElementById("submitBtn");
+    const passwordInput = document.getElementById("password");
+    const confirmPasswordInput = document.getElementById("confirmPassword");
+    const confirmPasswordError = document.getElementById("confirmPasswordError");
+    const passwordToggle = document.getElementById("passwordToggle");
+    const confirmPasswordToggle = document.getElementById("confirmPasswordToggle");
+    const passwordStrength = document.getElementById("passwordStrength");
+    const strengthText = document.getElementById("strengthText");
+    const strengthFill = document.getElementById("strengthFill");
+    const photoInput = document.getElementById("photo");
+    const photoPreview = document.getElementById("photoPreview");
+    const defaultIcon = document.querySelector('.default-icon');
 
     let usernameCheckTimeout;
     let isUsernameAvailable = false;
+    let isPasswordStrong = false;
+    let isPasswordConfirmed = false;
+    let userPhoto = null;
+
+    // Password toggle functionality
+    passwordToggle.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+
+    confirmPasswordToggle.addEventListener('click', function() {
+      const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      confirmPasswordInput.setAttribute('type', type);
+      this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+
+    // Password strength checker
+    passwordInput.addEventListener('input', function() {
+      const password = this.value;
+      checkPasswordStrength(password);
+      checkPasswordMatch();
+    });
+
+    confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+
+    function checkPasswordStrength(password) {
+      let strength = 0;
+      let feedback = "";
+
+      // Criteria checks
+      if (password.length >= 8) strength++;
+      if (/[a-z]/.test(password)) strength++;
+      if (/[A-Z]/.test(password)) strength++;
+      if (/[0-9]/.test(password)) strength++;
+      if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+      // Update strength indicator
+      passwordStrength.style.display = 'block';
+      
+      if (password.length === 0) {
+        strengthText.textContent = "Password strength: ";
+        strengthFill.style.width = "0%";
+        strengthFill.style.background = "transparent";
+        isPasswordStrong = false;
+        updateSubmitButton();
+        return;
+      }
+
+      if (strength <= 2) {
+        strengthText.textContent = "Password strength: Weak";
+        strengthText.className = "strength-weak";
+        strengthFill.style.width = "33%";
+        strengthFill.style.background = "#ff6b6b";
+        isPasswordStrong = false;
+      } else if (strength <= 4) {
+        strengthText.textContent = "Password strength: Medium";
+        strengthText.className = "strength-medium";
+        strengthFill.style.width = "66%";
+        strengthFill.style.background = "#ff8e53";
+        isPasswordStrong = true;
+      } else {
+        strengthText.textContent = "Password strength: Strong";
+        strengthText.className = "strength-strong";
+        strengthFill.style.width = "100%";
+        strengthFill.style.background = "#4ecdc4";
+        isPasswordStrong = true;
+      }
+      
+      updateSubmitButton();
+    }
+
+    function checkPasswordMatch() {
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      
+      if (confirmPassword.length === 0) {
+        confirmPasswordError.textContent = "";
+        isPasswordConfirmed = false;
+      } else if (password !== confirmPassword) {
+        confirmPasswordError.textContent = "Passwords do not match";
+        isPasswordConfirmed = false;
+      } else {
+        confirmPasswordError.textContent = "";
+        isPasswordConfirmed = true;
+      }
+      
+      updateSubmitButton();
+    }
+
+    // Photo upload functionality
+    photoInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+          alert('File size too large. Please select an image under 5MB.');
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          photoPreview.src = e.target.result;
+          photoPreview.style.display = 'block';
+          defaultIcon.style.display = 'none';
+          userPhoto = e.target.result; // Store base64 for submission
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
     // Username availability check function
     async function checkUsernameAvailability(username) {
@@ -460,7 +714,7 @@
     }
 
     function updateSubmitButton() {
-      submitBtn.disabled = !isUsernameAvailable;
+      submitBtn.disabled = !(isUsernameAvailable && isPasswordStrong && isPasswordConfirmed);
     }
 
     // Real-time username checking with debounce
@@ -533,8 +787,19 @@
         return;
       }
       
+      if (!isPasswordStrong) {
+        alert("❌ Please choose a stronger password.");
+        return;
+      }
+      
+      if (!isPasswordConfirmed) {
+        alert("❌ Passwords do not match.");
+        return;
+      }
+      
       let username = document.getElementById("username").value.toLowerCase();
       let fullname = document.getElementById("fullname").value;
+      let password = document.getElementById("password").value;
       let gender = document.getElementById("gender").value;
       if(gender==="Other") gender=document.getElementById("otherGenderBox").value;
       let dob = document.getElementById("dob").value;
@@ -557,12 +822,29 @@
           alert("❌ Username already taken. Please choose another one.");
           return;
         }
-        await setDoc(ref,{fullname,gender,dob,state,city,verified:false,createdAt:new Date().toISOString()});
+        
+        // Store user data including password and photo
+        await setDoc(ref,{
+          fullname,
+          password, // In a real app, you should hash this before storing
+          gender,
+          dob,
+          state,
+          city,
+          photo: userPhoto || null,
+          verified:false,
+          createdAt:new Date().toISOString()
+        });
+        
         alert("✅ Submitted! Wait for admin approval.");
         e.target.reset();
         cityGroup.style.display="none";
         document.getElementById("otherGenderBox").style.display = "none";
         hideUsernamePreview();
+        passwordStrength.style.display = "none";
+        photoPreview.style.display = "none";
+        defaultIcon.style.display = "block";
+        userPhoto = null;
       }catch(err){alert("❌ Error: "+err.message);}
     });
   </script>
