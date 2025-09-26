@@ -3,111 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xzedesen Signup</title>
+  <title>Xzedesen | Signup</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-
     body {
-      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #fff;
-      overflow: hidden;
-      position: relative;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      height: 100vh; display: flex; justify-content: center; align-items: center;
+      color: #fff; overflow: hidden; position: relative;
     }
-
-    /* Background bubbles */
     .bg-bubbles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
     .bg-bubbles li {
-      position: absolute; list-style: none; display: block; width: 40px; height: 40px;
-      background-color: rgba(255, 255, 255, 0.1);
-      bottom: -160px; animation: square 20s infinite; border-radius: 50%;
+      position: absolute; list-style: none; display: block;
+      width: 40px; height: 40px; background-color: rgba(255, 255, 255, 0.1);
+      bottom: -160px; animation: square 15s infinite; transition-timing-function: linear; border-radius: 50%;
     }
     .bg-bubbles li:nth-child(1) { left: 10%; width: 80px; height: 80px; }
-    .bg-bubbles li:nth-child(2) { left: 20%; animation-delay: 2s; width: 60px; height: 60px; }
-    .bg-bubbles li:nth-child(3) { left: 25%; animation-delay: 4s; width: 100px; height: 100px; }
-    .bg-bubbles li:nth-child(4) { left: 40%; animation-delay: 3s; width: 70px; height: 70px; }
+    .bg-bubbles li:nth-child(2) { left: 20%; animation-delay: 1s; animation-duration: 12s; width: 60px; height: 60px; }
+    .bg-bubbles li:nth-child(3) { left: 25%; animation-delay: 2s; width: 70px; height: 70px; }
+    .bg-bubbles li:nth-child(4) { left: 40%; animation-duration: 15s; width: 90px; height: 90px; }
     .bg-bubbles li:nth-child(5) { left: 70%; width: 50px; height: 50px; }
-    .bg-bubbles li:nth-child(6) { left: 80%; animation-delay: 6s; width: 60px; height: 60px; }
-    .bg-bubbles li:nth-child(7) { left: 32%; animation-delay: 8s; width: 75px; height: 75px; }
-    .bg-bubbles li:nth-child(8) { left: 55%; animation-delay: 5s; width: 90px; height: 90px; }
-    .bg-bubbles li:nth-child(9) { left: 25%; animation-delay: 7s; width: 65px; height: 65px; }
-    .bg-bubbles li:nth-child(10) { left: 90%; animation-delay: 9s; width: 45px; height: 45px; }
-
+    .bg-bubbles li:nth-child(6) { left: 80%; animation-delay: 2s; width: 60px; height: 60px; }
+    .bg-bubbles li:nth-child(7) { left: 32%; animation-delay: 4s; width: 75px; height: 75px; }
+    .bg-bubbles li:nth-child(8) { left: 55%; animation-delay: 8s; animation-duration: 25s; width: 100px; height: 100px; }
+    .bg-bubbles li:nth-child(9) { left: 25%; animation-delay: 1s; animation-duration: 25s; width: 65px; height: 65px; }
+    .bg-bubbles li:nth-child(10) { left: 90%; animation-delay: 7s; width: 45px; height: 45px; }
     @keyframes square {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; }
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 50%; }
+      100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 20%; }
     }
 
-    /* Signup form */
     .signup-container {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 40px;
-      width: 100%;
-      max-width: 450px;
-      text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      animation: fadeIn 0.8s ease-out;
+      background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);
+      border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      width: 100%; max-width: 500px; padding: 40px; text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1); animation: fadeIn 0.8s ease-out;
     }
-
     @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Gradient heading like xzedesen */
-    h2 {
-      font-size: 2.2rem;
-      font-weight: 800;
+    .logo h1 {
+      font-size: 2.8rem; font-weight: 800;
       background: linear-gradient(45deg, #ff6b6b, #ff8e53, #ff6b6b);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       text-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
-      margin-bottom: 25px;
+      letter-spacing: 2px; margin-bottom: 10px;
     }
 
+    h2 { margin-bottom: 20px; font-size: 1.5rem; color: rgba(255,255,255,0.9); }
     .form-group { margin-bottom: 20px; text-align: left; }
-    .form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
     .form-group input, .form-group select {
-      width: 100%; padding: 12px; border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: rgba(255, 255, 255, 0.07);
-      color: #fff; font-size: 14px;
-      appearance: none;
+      width: 100%; padding: 14px; background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; font-size: 16px; color: #fff;
     }
-    .form-group select option { background: #16213e; color: white; }
+    .form-group select option { background: #1a1a2e; color: #fff; }
+    .form-group input:focus, .form-group select:focus {
+      outline: none; background: rgba(255,255,255,0.1);
+      border-color: rgba(255,107,107,0.6);
+      box-shadow: 0 0 0 3px rgba(255,107,107,0.2);
+    }
+    #username-status { margin-top: 6px; font-size: 0.9rem; }
 
-    .form-group input::placeholder { color: rgba(255, 255, 255, 0.5); }
-
-    #username-status { margin-top: 5px; font-size: 14px; }
-
-    button {
+    .signup-btn {
+      width: 100%; padding: 16px;
       background: linear-gradient(45deg, #ff6b6b, #ff8e53);
-      color: white; border: none;
-      padding: 14px; width: 100%;
-      border-radius: 10px; font-size: 16px;
-      cursor: pointer; font-weight: bold;
-      transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+      border: none; border-radius: 10px; color: white; font-size: 18px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s ease; margin-top: 10px;
     }
-    button:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(255, 107, 107, 0.6); }
-    button:active { transform: translateY(0); }
+    .signup-btn:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(255,107,107,0.6); }
 
-    /* Back to login link */
-    .back-login {
-      margin-top: 15px;
-      display: inline-block;
-      color: #ff6b6b;
-      font-weight: 600;
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-    .back-login:hover {
-      color: #ff8e53;
-      text-decoration: underline;
-    }
+    .back-btn { display: block; margin-top: 20px; color: #ff6b6b; font-weight: 600; text-decoration: none; }
+    .back-btn:hover { color: #ff8e53; text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -117,64 +83,51 @@
   </ul>
 
   <div class="signup-container">
+    <div class="logo"><h1>xzedesen</h1></div>
     <h2>Signup Form</h2>
     <form id="signupForm">
       <div class="form-group">
         <label for="username">Choose Username</label>
-        <input id="username" placeholder="Enter Username" required>
+        <input id="username" placeholder="Enter username" required>
         <div id="username-status"></div>
       </div>
-
       <div class="form-group">
         <label for="name">Full Name</label>
         <input id="name" placeholder="Enter your full name" required>
       </div>
-
-      <!-- Gender -->
       <div class="form-group">
         <label for="gender">Gender</label>
         <select id="gender" required>
-          <option value="">-- Select Gender --</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
+          <option value="">Select</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
         </select>
-        <input type="text" id="other-gender" placeholder="Please specify" style="display:none; margin-top:10px;">
+        <input id="other-gender" placeholder="Please specify" style="display:none; margin-top:10px;">
       </div>
-
       <div class="form-group">
         <label for="dob">Date of Birth</label>
         <input id="dob" type="date" required>
       </div>
-
       <div class="form-group">
         <label for="state">State</label>
-        <select id="state" required>
-          <option value="">-- Select State --</option>
-        </select>
+        <select id="state" required></select>
       </div>
-
-      <div class="form-group" id="city-group" style="display:none;">
+      <div class="form-group">
         <label for="city">City</label>
-        <select id="city"></select>
+        <select id="city" required></select>
+        <input id="other-location" placeholder="Please specify" style="display:none; margin-top:10px;">
       </div>
-
-      <!-- Other city input -->
-      <input type="text" id="other-location" placeholder="Enter your city" style="display:none; margin-top:10px;">
-
       <div class="form-group">
         <label for="photo">Upload Photo</label>
-        <input type="file" id="photo" accept="image/*" required>
+        <input id="photo" type="file" accept="image/*" required>
       </div>
-
-      <button type="submit">Submit</button>
+      <button type="submit" class="signup-btn">Submit</button>
     </form>
-
-    <!-- Back to login -->
-    <a href="index.html" class="back-login"><i class="fas fa-arrow-left"></i> Back to Login</a>
+    <a href="index.html" class="back-btn">← Back to Login</a>
   </div>
 
-  <!-- Firebase script same as pehle -->
+  <!-- ✅ Firebase & Username Validation -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
@@ -193,26 +146,63 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
+    // Gender toggle
     document.getElementById("gender").addEventListener("change", function() {
-      const otherGender = document.getElementById("other-gender");
-      if (this.value === "Other") { otherGender.style.display = "block"; otherGender.required = true; }
-      else { otherGender.style.display = "none"; otherGender.required = false; }
+      document.getElementById("other-gender").style.display = this.value === "Other" ? "block" : "none";
     });
+
+    // State & City loading
+    fetch("cities.json").then(r => r.json()).then(data => {
+      const stateSelect = document.getElementById("state");
+      const citySelect = document.getElementById("city");
+      stateSelect.innerHTML = `<option value="">Select State</option>`;
+      for (let state in data) {
+        stateSelect.innerHTML += `<option value="${state}">${state}</option>`;
+      }
+      stateSelect.addEventListener("change", () => {
+        const cities = data[stateSelect.value] || [];
+        citySelect.innerHTML = `<option value="">Select City</option>`;
+        cities.forEach(c => citySelect.innerHTML += `<option value="${c}">${c}</option>`);
+        citySelect.innerHTML += `<option value="Other">Other</option>`;
+      });
+      citySelect.addEventListener("change", () => {
+        document.getElementById("other-location").style.display = citySelect.value === "Other" ? "block" : "none";
+      });
+    });
+
+    // Username validation
+    function validateUsername(rawUsername) {
+      if (/\s/.test(rawUsername)) return "❌ Username cannot contain spaces";
+      if (!/\d/.test(rawUsername)) return "❌ Username must include at least one number";
+      if (rawUsername.length < 4) return "❌ Username must be at least 4 characters long";
+      return "valid";
+    }
 
     document.getElementById("username").addEventListener("blur", async () => {
       let rawUsername = document.getElementById("username").value.toLowerCase();
-      if (!rawUsername) return;
+      const statusDiv = document.getElementById("username-status");
+      const validationMsg = validateUsername(rawUsername);
+      if (validationMsg !== "valid") {
+        statusDiv.innerText = validationMsg;
+        statusDiv.style.color = "red"; return;
+      }
       let username = rawUsername + "@xzedesen.com";
       const userRef = doc(db, "users", username);
       const userSnap = await getDoc(userRef);
-      const statusDiv = document.getElementById("username-status");
-      if (userSnap.exists()) { statusDiv.innerText = "❌ Username not available"; statusDiv.style.color = "red"; }
-      else { statusDiv.innerText = "✅ Username available"; statusDiv.style.color = "lightgreen"; }
+      if (userSnap.exists()) {
+        statusDiv.innerText = "❌ Username not available";
+        statusDiv.style.color = "red";
+      } else {
+        statusDiv.innerText = "✅ Username available";
+        statusDiv.style.color = "lightgreen";
+      }
     });
 
     document.getElementById("signupForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       let rawUsername = document.getElementById("username").value.toLowerCase();
+      const validationMsg = validateUsername(rawUsername);
+      if (validationMsg !== "valid") { alert(validationMsg); return; }
       let username = rawUsername + "@xzedesen.com";
       let name = document.getElementById("name").value;
       let gender = document.getElementById("gender").value;
@@ -230,51 +220,15 @@
         await uploadBytes(storageRef, file);
         const photoURL = await getDownloadURL(storageRef);
         await setDoc(doc(db, "users", username), {
-          name, gender, dob, location,
-          photoURL: photoURL, verified: false, createdAt: new Date().toISOString()
+          name, gender, dob, location, photoURL,
+          verified: false, createdAt: new Date().toISOString()
         });
         alert("✅ Details submitted! Wait for admin approval.");
         document.getElementById("signupForm").reset();
         document.getElementById("username-status").innerText = "";
-      } catch (err) { alert("❌ Error: " + err.message); }
-    });
-
-    let citiesByState = {};
-    fetch("cities.json").then(res => res.json()).then(data => {
-      citiesByState = data;
-      const stateDropdown = document.getElementById("state");
-      Object.keys(citiesByState).forEach(state => {
-        const option = document.createElement("option");
-        option.value = state; option.textContent = state;
-        stateDropdown.appendChild(option);
-      });
-    });
-
-    document.getElementById("state").addEventListener("change", function() {
-      const state = this.value;
-      const cityDropdown = document.getElementById("city");
-      const cityGroup = document.getElementById("city-group");
-      const otherBox = document.getElementById("other-location");
-      cityDropdown.innerHTML = "";
-      if (state && citiesByState[state]) {
-        cityGroup.style.display = "block"; otherBox.style.display = "none";
-        citiesByState[state].forEach(city => {
-          const option = document.createElement("option");
-          option.value = city; option.textContent = city;
-          cityDropdown.appendChild(option);
-        });
-        const otherOption = document.createElement("option");
-        otherOption.value = "Other"; otherOption.textContent = "Other";
-        cityDropdown.appendChild(otherOption);
-      } else {
-        cityGroup.style.display = "none"; otherBox.style.display = "none";
+      } catch (err) {
+        alert("❌ Error: " + err.message);
       }
-    });
-
-    document.getElementById("city").addEventListener("change", function() {
-      const otherBox = document.getElementById("other-location");
-      if (this.value === "Other") { otherBox.style.display = "block"; otherBox.required = true; }
-      else { otherBox.style.display = "none"; otherBox.required = false; }
     });
   </script>
 </body>
