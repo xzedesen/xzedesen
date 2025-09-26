@@ -1,1088 +1,465 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Signup | Xzedesen</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+  import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
-    html, body {
-      height: 100%;
-      width: 100%;
-      overflow-x: hidden;
-    }
+  const firebaseConfig = {
+    apiKey: "AIzaSyDEBKGAsMF8woHBpOY5OK4isHGA_anAEPs",
+    authDomain: "xzedesen-916ea.firebaseapp.com",
+    projectId: "xzedesen-916ea",
+    storageBucket: "xzedesen-916ea.firebasestorage.app",
+    messagingSenderId: "1019829731381",
+    appId: "1:1019829731381:web:e987812821dd660578317c"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
 
-    body {
-      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-      min-height: 100vh;
-      min-height: -webkit-fill-available;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #fff;
-      position: relative;
-      padding: 20px;
-    }
+  // DOM elements
+  const stateSelect = document.getElementById("state");
+  const cityGroup = document.getElementById("city-group");
+  const citySelect = document.getElementById("city");
+  const usernameInput = document.getElementById("username");
+  const usernamePreview = document.getElementById("usernamePreview");
+  const submitBtn = document.getElementById("submitBtn");
+  const passwordInput = document.getElementById("password");
+  const confirmPasswordInput = document.getElementById("confirmPassword");
+  const confirmPasswordError = document.getElementById("confirmPasswordError");
+  const passwordToggle = document.getElementById("passwordToggle");
+  const confirmPasswordToggle = document.getElementById("confirmPasswordToggle");
+  const passwordStrength = document.getElementById("passwordStrength");
+  const strengthText = document.getElementById("strengthText");
+  const strengthFill = document.getElementById("strengthFill");
+  const photoInput = document.getElementById("photo");
+  const photoPreview = document.getElementById("photoPreview");
+  const defaultIcon = document.querySelector('.default-icon');
+  const uploadPhotoBtn = document.getElementById("uploadPhotoBtn");
+  const takePhotoBtn = document.getElementById("takePhotoBtn");
+  const cameraModal = document.getElementById("cameraModal");
+  const cameraVideo = document.getElementById("cameraVideo");
+  const cameraCanvas = document.getElementById("cameraCanvas");
+  const captureBtn = document.getElementById("captureBtn");
+  const closeCamera = document.getElementById("closeCamera");
 
-    .bg-bubbles{
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      pointer-events: none;
-    }
-    .bg-bubbles li{
-      position: absolute;
-      list-style: none;
-      width: 40px;
-      height: 40px;
-      background: rgba(255,255,255,0.1);
-      top: -160px;
-      animation: square 12s infinite linear;
-      border-radius: 50%;
-    }
-    .bg-bubbles li:nth-child(1){left:10%;width:80px;height:80px;}
-    .bg-bubbles li:nth-child(2){left:20%;animation-delay:1.5s;width:60px;height:60px;}
-    .bg-bubbles li:nth-child(3){left:25%;animation-delay:3s;width:70px;height:70px;}
-    .bg-bubbles li:nth-child(4){left:40%;animation-delay:1s;width:90px;height:90px;}
-    .bg-bubbles li:nth-child(5){left:70%;animation-delay:2.5s;width:50px;height:50px;}
-    .bg-bubbles li:nth-child(6){left:80%;animation-delay:4.5s;width:60px;height:60px;}
-    .bg-bubbles li:nth-child(7){left:32%;animation-delay:6s;width:75px;height:75px;}
-    .bg-bubbles li:nth-child(8){left:55%;animation-delay:3.5s;width:100px;height:100px;}
-    .bg-bubbles li:nth-child(9){left:25%;animation-delay:7.5s;width:65px;height:65px;}
-    .bg-bubbles li:nth-child(10){left:90%;animation-delay:5.5s;width:45px;height:45px;}
-    @keyframes square {
-      0%{transform:translateY(0) rotate(0);opacity:1;}
-      100%{transform:translateY(1000px) rotate(720deg);opacity:0;}
-    }
+  let usernameCheckTimeout;
+  let isUsernameAvailable = false;
+  let isPasswordStrong = false;
+  let isPasswordConfirmed = false;
+  let userPhoto = null;
+  let stream = null;
 
-    .container{
-      background: rgba(30, 30, 50, 0.85);
-      -webkit-backdrop-filter: blur(10px);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 30px 25px;
-      width: 100%;
-      max-width: 500px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      animation: fadeIn .8s ease-out;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
+  // Password toggle functionality
+  passwordToggle.addEventListener('click', function() {
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+  });
+
+  confirmPasswordToggle.addEventListener('click', function() {
+    const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    confirmPasswordInput.setAttribute('type', type);
+    this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+  });
+
+  // Password strength checker
+  passwordInput.addEventListener('input', function() {
+    const password = this.value;
+    checkPasswordStrength(password);
+    checkPasswordMatch();
+  });
+
+  confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+
+  function checkPasswordStrength(password) {
+    let strength = 0;
+
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+    passwordStrength.style.display = 'block';
     
-    @media (max-width: 480px) {
-      .container {
-        padding: 25px 20px;
-        margin: 10px;
-      }
-    }
-    
-    @keyframes fadeIn{
-      from{opacity:0;transform:translateY(20px);}
-      to{opacity:1;transform:translateY(0);}
-    }
-
-    .logo{
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .logo h1{
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(45deg,#ff6b6b,#ff8e53);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    @media (max-width: 480px) {
-      .logo h1 {
-        font-size: 2.2rem;
-      }
+    if (password.length === 0) {
+      strengthText.textContent = "Password strength: ";
+      strengthFill.style.width = "0%";
+      strengthFill.style.background = "transparent";
+      isPasswordStrong = false;
+      updateSubmitButton();
+      return;
     }
 
-    h2{
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 1.4rem;
+    if (strength <= 2) {
+      strengthText.textContent = "Password strength: Weak";
+      strengthText.className = "strength-weak";
+      strengthFill.style.width = "33%";
+      strengthFill.style.background = "#ff6b6b";
+      isPasswordStrong = false;
+    } else if (strength <= 4) {
+      strengthText.textContent = "Password strength: Medium";
+      strengthText.className = "strength-medium";
+      strengthFill.style.width = "66%";
+      strengthFill.style.background = "#ff8e53";
+      isPasswordStrong = true;
+    } else {
+      strengthText.textContent = "Password strength: Strong";
+      strengthText.className = "strength-strong";
+      strengthFill.style.width = "100%";
+      strengthFill.style.background = "#4ecdc4";
+      isPasswordStrong = true;
     }
     
-    @media (max-width: 480px) {
-      h2 {
-        font-size: 1.2rem;
-      }
-    }
+    updateSubmitButton();
+  }
 
-    .form-group{
-      margin-bottom: 18px;
-      position: relative;
-    }
-    .form-group label{
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      font-size: 14px;
-    }
-    .form-group input,
-    .form-group select{
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.3);
-      background: rgba(255,255,255,0.12);
-      color: #fff;
-      font-size: 16px;
-      -webkit-appearance: none;
-      appearance: none;
+  function checkPasswordMatch() {
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+    
+    if (confirmPassword.length === 0) {
+      confirmPasswordError.textContent = "";
+      isPasswordConfirmed = false;
+    } else if (password !== confirmPassword) {
+      confirmPasswordError.textContent = "Passwords do not match";
+      isPasswordConfirmed = false;
+    } else {
+      confirmPasswordError.textContent = "";
+      isPasswordConfirmed = true;
     }
     
-    .form-group input:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: #ff6b6b;
-      box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
-    }
-    
-    .form-group input::placeholder{
-      color: rgba(255,255,255,0.6);
-    }
-    
-    .form-group input[type="date"] {
-      min-height: 50px;
-    }
-    
-    .form-group select{
-      color: #000;
-      background: #fff;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right 16px center;
-      background-size: 16px;
-      padding-right: 40px;
-    }
+    updateSubmitButton();
+  }
 
-    /* Password field styles */
-    .password-wrapper {
-      position: relative;
-    }
-    
-    .password-toggle {
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.6);
-      cursor: pointer;
-      font-size: 16px;
-      padding: 0;
-      z-index: 2;
-    }
-    
-    .password-strength {
-      margin-top: 8px;
-      font-size: 13px;
-      display: none;
-    }
-    
-    .strength-weak { color: #ff6b6b; }
-    .strength-medium { color: #ff8e53; }
-    .strength-strong { color: #4ecdc4; }
-    
-    .strength-bar {
-      height: 4px;
-      border-radius: 2px;
-      margin-top: 5px;
-      background: rgba(255,255,255,0.2);
-      overflow: hidden;
-    }
-    
-    .strength-fill {
-      height: 100%;
-      width: 0%;
-      transition: width 0.3s, background 0.3s;
-    }
-    
-    /* Photo upload styles */
-    .photo-upload {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-    
-    .photo-preview {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      overflow: hidden;
-      margin-bottom: 10px;
-      border: 2px solid rgba(255,255,255,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.05);
-    }
-    
-    .photo-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: none;
-    }
-    
-    .photo-preview .default-icon {
-      font-size: 40px;
-      color: rgba(255,255,255,0.5);
-    }
-    
-    .photo-options {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-      max-width: 300px;
-    }
-    
-    .photo-option-btn {
-      flex: 1;
-      padding: 10px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s;
-      text-align: center;
-      border: none;
-      color: white;
-      font-size: 14px;
-    }
-    
-    .photo-option-btn:hover {
-      background: rgba(255,255,255,0.2);
-    }
-    
-    .photo-upload input[type="file"] {
-      display: none;
-    }
-    
-    /* Camera modal styles */
-    .camera-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.8);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .camera-container {
-      background: rgba(30, 30, 50, 0.95);
-      border-radius: 16px;
-      padding: 20px;
-      width: 90%;
-      max-width: 500px;
-      text-align: center;
-    }
-    
-    #cameraVideo {
-      width: 100%;
-      max-width: 400px;
-      border-radius: 10px;
-      background: #000;
-    }
-    
-    .camera-controls {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-    
-    .camera-btn {
-      padding: 10px 20px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    
-    .capture-btn {
-      background: linear-gradient(45deg,#ff6b6b,#ff8e53);
-      color: white;
-    }
-    
-    .close-camera {
-      background: rgba(255,255,255,0.1);
-      color: white;
-    }
+  // Photo upload functionality
+  uploadPhotoBtn.addEventListener('click', function() {
+    photoInput.click();
+  });
 
-    /* Username availability styles */
-    .username-preview {
-      margin-top: 8px;
-      font-size: 13px;
-      padding: 8px 12px;
-      border-radius: 6px;
-      background: rgba(255,255,255,0.1);
-      display: none;
-    }
-    
-    .username-available {
-      color: #4ecdc4;
-      border-left: 3px solid #4ecdc4;
-    }
-    
-    .username-taken {
-      color: #ff6b6b;
-      border-left: 3px solid #ff6b6b;
-    }
-    
-    .username-checking {
-      color: #ff8e53;
-      border-left: 3px solid #ff8e53;
-    }
-    
-    .availability-status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .row{
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .row .form-group{
-      flex: 1;
-      min-width: 120px;
-    }
-    
-    @media (max-width: 480px) {
-      .row {
-        flex-direction: column;
-        gap: 0;
-      }
-      .row .form-group {
-        flex: auto;
-      }
-    }
-
-    .btn{
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(45deg,#ff6b6b,#ff8e53);
-      border: none;
-      border-radius: 10px;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: .3s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .btn:hover,
-    .btn:active {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255,107,107,.5);
-    }
-    
-    .btn:disabled {
-      background: rgba(255,255,255,0.2);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .back-btn{
-      text-align: center;
-      margin-top: 20px;
-    }
-    .back-btn a{
-      color: #ff6b6b;
-      text-decoration: none;
-      font-weight: 600;
-      transition: .3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .back-btn a:hover{
-      color: #ff8e53;
-      text-decoration: underline;
-    }
-
-    .error{
-      color: #ff6b6b;
-      font-size: 13px;
-      margin-top: 5px;
-      display: block;
-      min-height: 18px;
-    }
-    
-    #otherGenderBox{
-      display: none;
-      margin-top: 8px;
-    }
-    
-    #city-group{
-      display: none;
-    }
-    
-    html {
-      -webkit-text-size-adjust: 100%;
-      text-size-adjust: 100%;
-    }
-  </style>
-</head>
-<body>
-  <ul class="bg-bubbles">
-    <li></li><li></li><li></li><li></li><li></li>
-    <li></li><li></li><li></li><li></li><li></li>
-  </ul>
-
-  <div class="container">
-    <div class="logo"><h1>Signup</h1></div>
-    <h2>Join the Verified Realm</h2>
-
-    <form id="signupForm">
-      <div class="photo-upload">
-        <div class="photo-preview">
-          <i class="fas fa-user-circle default-icon"></i>
-          <img id="photoPreview" src="" alt="Profile Preview">
-        </div>
-        <div class="photo-options">
-          <button type="button" class="photo-option-btn" id="uploadPhotoBtn">
-            <i class="fas fa-upload"></i> Upload
-          </button>
-          <button type="button" class="photo-option-btn" id="takePhotoBtn">
-            <i class="fas fa-camera"></i> Take Photo
-          </button>
-        </div>
-        <input type="file" id="photo" accept="image/*">
-      </div>
-
-      <div class="form-group">
-        <label for="username">Username <small>(e.g., user123)</small></label>
-        <input type="text" id="username" placeholder="Choose username" required>
-        <div id="usernameError" class="error"></div>
-        <div id="usernamePreview" class="username-preview"></div>
-      </div>
-
-      <div class="form-group">
-        <label for="fullname">Full Name</label>
-        <input type="text" id="fullname" placeholder="Enter your full name" required>
-      </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <div class="password-wrapper">
-          <input type="password" id="password" placeholder="Create a strong password" required>
-          <button type="button" class="password-toggle" id="passwordToggle">
-            <i class="fas fa-eye"></i>
-          </button>
-        </div>
-        <div class="password-strength" id="passwordStrength">
-          <span id="strengthText">Password strength: </span>
-          <div class="strength-bar">
-            <div class="strength-fill" id="strengthFill"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="confirmPassword">Confirm Password</label>
-        <div class="password-wrapper">
-          <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
-          <button type="button" class="password-toggle" id="confirmPasswordToggle">
-            <i class="fas fa-eye"></i>
-          </button>
-        </div>
-        <div id="confirmPasswordError" class="error"></div>
-      </div>
-
-      <div class="row">
-        <div class="form-group">
-          <label for="gender">Gender</label>
-          <select id="gender" required>
-            <option value="">Select gender</option>
-            <option>Male</option>
-            <option>Female</option>
-            <option>Other</option>
-          </select>
-          <input type="text" id="otherGenderBox" placeholder="Please specify">
-        </div>
-
-        <div class="form-group">
-          <label for="dob">Date of Birth</label>
-          <input type="date" id="dob" required>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="state">State</label>
-        <select id="state" required>
-          <option value="">Select state</option>
-        </select>
-      </div>
-
-      <div class="form-group" id="city-group">
-        <label for="city">City</label>
-        <select id="city" required>
-          <option value="">Select city</option>
-        </select>
-      </div>
-
-      <button type="submit" class="btn" id="submitBtn">Submit for Free Verification</button>
-    </form>
-
-    <div class="back-btn"><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Login</a></div>
-  </div>
-
-  <!-- Camera Modal -->
-  <div class="camera-modal" id="cameraModal">
-    <div class="camera-container">
-      <h3>Take a Profile Photo</h3>
-      <video id="cameraVideo" autoplay playsinline muted></video>
-      <canvas id="cameraCanvas" style="display:none;"></canvas>
-      <div class="camera-controls">
-        <button class="camera-btn capture-btn" id="captureBtn">Capture Photo</button>
-        <button class="camera-btn close-camera" id="closeCamera">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDEBKGAsMF8woHBpOY5OK4isHGA_anAEPs",
-      authDomain: "xzedesen-916ea.firebaseapp.com",
-      projectId: "xzedesen-916ea",
-      storageBucket: "xzedesen-916ea.firebasestorage.app",
-      messagingSenderId: "1019829731381",
-      appId: "1:1019829731381:web:e987812821dd660578317c"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // DOM elements
-    const stateSelect = document.getElementById("state");
-    const cityGroup = document.getElementById("city-group");
-    const citySelect = document.getElementById("city");
-    const usernameInput = document.getElementById("username");
-    const usernamePreview = document.getElementById("usernamePreview");
-    const submitBtn = document.getElementById("submitBtn");
-    const passwordInput = document.getElementById("password");
-    const confirmPasswordInput = document.getElementById("confirmPassword");
-    const confirmPasswordError = document.getElementById("confirmPasswordError");
-    const passwordToggle = document.getElementById("passwordToggle");
-    const confirmPasswordToggle = document.getElementById("confirmPasswordToggle");
-    const passwordStrength = document.getElementById("passwordStrength");
-    const strengthText = document.getElementById("strengthText");
-    const strengthFill = document.getElementById("strengthFill");
-    const photoInput = document.getElementById("photo");
-    const photoPreview = document.getElementById("photoPreview");
-    const defaultIcon = document.querySelector('.default-icon');
-    const uploadPhotoBtn = document.getElementById("uploadPhotoBtn");
-    const takePhotoBtn = document.getElementById("takePhotoBtn");
-    const cameraModal = document.getElementById("cameraModal");
-    const cameraVideo = document.getElementById("cameraVideo");
-    const cameraCanvas = document.getElementById("cameraCanvas");
-    const captureBtn = document.getElementById("captureBtn");
-    const closeCamera = document.getElementById("closeCamera");
-
-    let usernameCheckTimeout;
-    let isUsernameAvailable = false;
-    let isPasswordStrong = false;
-    let isPasswordConfirmed = false;
-    let userPhoto = null;
-    let stream = null;
-
-    // Password toggle functionality
-    passwordToggle.addEventListener('click', function() {
-      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      passwordInput.setAttribute('type', type);
-      this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
-    });
-
-    confirmPasswordToggle.addEventListener('click', function() {
-      const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      confirmPasswordInput.setAttribute('type', type);
-      this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
-    });
-
-    // Password strength checker
-    passwordInput.addEventListener('input', function() {
-      const password = this.value;
-      checkPasswordStrength(password);
-      checkPasswordMatch();
-    });
-
-    confirmPasswordInput.addEventListener('input', checkPasswordMatch);
-
-    function checkPasswordStrength(password) {
-      let strength = 0;
-      let feedback = "";
-
-      // Criteria checks
-      if (password.length >= 8) strength++;
-      if (/[a-z]/.test(password)) strength++;
-      if (/[A-Z]/.test(password)) strength++;
-      if (/[0-9]/.test(password)) strength++;
-      if (/[^A-Za-z0-9]/.test(password)) strength++;
-
-      // Update strength indicator
-      passwordStrength.style.display = 'block';
-      
-      if (password.length === 0) {
-        strengthText.textContent = "Password strength: ";
-        strengthFill.style.width = "0%";
-        strengthFill.style.background = "transparent";
-        isPasswordStrong = false;
-        updateSubmitButton();
+  photoInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size too large. Please select an image under 5MB.');
         return;
       }
-
-      if (strength <= 2) {
-        strengthText.textContent = "Password strength: Weak";
-        strengthText.className = "strength-weak";
-        strengthFill.style.width = "33%";
-        strengthFill.style.background = "#ff6b6b";
-        isPasswordStrong = false;
-      } else if (strength <= 4) {
-        strengthText.textContent = "Password strength: Medium";
-        strengthText.className = "strength-medium";
-        strengthFill.style.width = "66%";
-        strengthFill.style.background = "#ff8e53";
-        isPasswordStrong = true;
-      } else {
-        strengthText.textContent = "Password strength: Strong";
-        strengthText.className = "strength-strong";
-        strengthFill.style.width = "100%";
-        strengthFill.style.background = "#4ecdc4";
-        isPasswordStrong = true;
-      }
       
-      updateSubmitButton();
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        photoPreview.src = e.target.result;
+        photoPreview.style.display = 'block';
+        defaultIcon.style.display = 'none';
+        userPhoto = e.target.result;
+      };
+      reader.readAsDataURL(file);
     }
+  });
 
-    function checkPasswordMatch() {
-      const password = passwordInput.value;
-      const confirmPassword = confirmPasswordInput.value;
-      
-      if (confirmPassword.length === 0) {
-        confirmPasswordError.textContent = "";
-        isPasswordConfirmed = false;
-      } else if (password !== confirmPassword) {
-        confirmPasswordError.textContent = "Passwords do not match";
-        isPasswordConfirmed = false;
-      } else {
-        confirmPasswordError.textContent = "";
-        isPasswordConfirmed = true;
-      }
-      
-      updateSubmitButton();
-    }
+  // Camera functionality
+  takePhotoBtn.addEventListener('click', function() {
+    openCamera();
+  });
 
-    // Photo upload functionality
-    uploadPhotoBtn.addEventListener('click', function() {
-      photoInput.click();
-    });
+  closeCamera.addEventListener('click', function() {
+    closeCameraModal();
+  });
 
-    photoInput.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
-          alert('File size too large. Please select an image under 5MB.');
-          return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          photoPreview.src = e.target.result;
-          photoPreview.style.display = 'block';
-          defaultIcon.style.display = 'none';
-          userPhoto = e.target.result; // Store base64 for submission
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+  captureBtn.addEventListener('click', function() {
+    capturePhoto();
+  });
 
-    // Camera functionality
-    takePhotoBtn.addEventListener('click', function() {
-      openCamera();
-    });
-
-    closeCamera.addEventListener('click', function() {
-      closeCameraModal();
-    });
-
-    captureBtn.addEventListener('click', function() {
-      capturePhoto();
-    });
-
-    function openCamera() {
-      cameraModal.style.display = 'flex';
-      
-      // Access the camera with iPhone Safari support
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { exact: "user" } // force front camera on iPhone Safari
-          },
-          audio: false
-        })
-        .then(function(mediaStream) {
-          stream = mediaStream;
-          cameraVideo.srcObject = stream;
-          cameraVideo.play().catch(err => console.warn("Autoplay issue:", err));
-        })
-        .catch(function(err) {
-          console.error("Error accessing camera: ", err);
-          // Try again without exact constraint if it fails
-          navigator.mediaDevices.getUserMedia({ 
-            video: true, 
-            audio: false 
-          })
-          .then(function(mediaStream) {
-            stream = mediaStream;
-            cameraVideo.srcObject = stream;
-            cameraVideo.play().catch(err => console.warn("Autoplay issue:", err));
-          })
-          .catch(function(fallbackErr) {
-            console.error("Fallback camera access failed: ", fallbackErr);
-            alert("Unable to access camera. Please check permissions and try again.");
-            closeCameraModal();
-          });
-        });
-      } else {
-        alert("Your browser doesn't support camera access.");
+  function openCamera() {
+    cameraModal.style.display = 'flex';
+    
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" },
+        audio: false
+      })
+      .then(function(mediaStream) {
+        stream = mediaStream;
+        cameraVideo.srcObject = stream;
+        cameraVideo.play().catch(err => console.warn("Autoplay issue:", err));
+      })
+      .catch(function(err) {
+        console.error("Error accessing camera: ", err);
+        alert("Unable to access camera. Please check permissions and try again.");
         closeCameraModal();
-      }
-    }
-
-    function closeCameraModal() {
-      cameraModal.style.display = 'none';
-      
-      // Stop the camera stream
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-        stream = null;
-      }
-    }
-
-    function capturePhoto() {
-      const context = cameraCanvas.getContext('2d');
-      cameraCanvas.width = cameraVideo.videoWidth;
-      cameraCanvas.height = cameraVideo.videoHeight;
-      
-      // Draw the current video frame to canvas
-      context.drawImage(cameraVideo, 0, 0, cameraCanvas.width, cameraCanvas.height);
-      
-      // Convert canvas to data URL
-      const photoDataUrl = cameraCanvas.toDataURL('image/jpeg', 0.8);
-      
-      // Update preview
-      photoPreview.src = photoDataUrl;
-      photoPreview.style.display = 'block';
-      defaultIcon.style.display = 'none';
-      userPhoto = photoDataUrl;
-      
-      // Close camera
+      });
+    } else {
+      alert("Your browser doesn't support camera access.");
       closeCameraModal();
     }
+  }
 
-    // Username availability check function
-    async function checkUsernameAvailability(username) {
-      if (username.length < 3) {
-        hideUsernamePreview();
-        return;
-      }
+  function closeCameraModal() {
+    cameraModal.style.display = 'none';
+    
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      stream = null;
+    }
+  }
 
-      showCheckingStatus();
-      
-      // Validate username format first
-      const validationError = validateUsername(username);
-      if (validationError) {
-        showUsernameError(validationError);
-        return;
-      }
+  function capturePhoto() {
+    const context = cameraCanvas.getContext('2d');
+    cameraCanvas.width = cameraVideo.videoWidth;
+    cameraCanvas.height = cameraVideo.videoHeight;
+    
+    context.drawImage(cameraVideo, 0, 0, cameraCanvas.width, cameraCanvas.height);
+    
+    const photoDataUrl = cameraCanvas.toDataURL('image/jpeg', 0.8);
+    
+    photoPreview.src = photoDataUrl;
+    photoPreview.style.display = 'block';
+    defaultIcon.style.display = 'none';
+    userPhoto = photoDataUrl;
+    
+    closeCameraModal();
+  }
 
-      const fullUsername = username + "@xzedesen.com";
-      
-      try {
-        const ref = doc(db, "users", fullUsername);
-        const snap = await getDoc(ref);
-        
-        if (snap.exists()) {
-          showUsernameTaken(fullUsername);
-        } else {
-          showUsernameAvailable(fullUsername);
-        }
-      } catch (err) {
-        showUsernameError("Error checking username availability");
-      }
+  // Username availability check
+  async function checkUsernameAvailability(username) {
+    if (username.length < 3) {
+      hideUsernamePreview();
+      return;
     }
 
-    function showCheckingStatus() {
-      usernamePreview.innerHTML = `
-        <div class="availability-status">
-          <i class="fas fa-spinner fa-spin"></i>
-          <span>Checking username availability...</span>
-        </div>
-      `;
-      usernamePreview.className = "username-preview username-checking";
-      usernamePreview.style.display = "block";
-      isUsernameAvailable = false;
-      updateSubmitButton();
+    showCheckingStatus();
+    
+    const validationError = validateUsername(username);
+    if (validationError) {
+      showUsernameError(validationError);
+      return;
     }
 
-    function showUsernameAvailable(fullUsername) {
-      usernamePreview.innerHTML = `
-        <div class="availability-status">
-          <i class="fas fa-check-circle"></i>
-          <span>Your username is <strong>${fullUsername}</strong></span>
-        </div>
-      `;
-      usernamePreview.className = "username-preview username-available";
-      usernamePreview.style.display = "block";
-      isUsernameAvailable = true;
-      updateSubmitButton();
-    }
-
-    function showUsernameTaken(fullUsername) {
-      usernamePreview.innerHTML = `
-        <div class="availability-status">
-          <i class="fas fa-times-circle"></i>
-          <span>Username already taken! <strong>${fullUsername}</strong> is not available</span>
-        </div>
-      `;
-      usernamePreview.className = "username-preview username-taken";
-      usernamePreview.style.display = "block";
-      isUsernameAvailable = false;
-      updateSubmitButton();
-    }
-
-    function showUsernameError(error) {
-      usernamePreview.innerHTML = `
-        <div class="availability-status">
-          <i class="fas fa-exclamation-circle"></i>
-          <span>${error}</span>
-        </div>
-      `;
-      usernamePreview.className = "username-preview username-taken";
-      usernamePreview.style.display = "block";
-      isUsernameAvailable = false;
-      updateSubmitButton();
-    }
-
-    function hideUsernamePreview() {
-      usernamePreview.style.display = "none";
-      isUsernameAvailable = false;
-      updateSubmitButton();
-    }
-
-    function updateSubmitButton() {
-      submitBtn.disabled = !(isUsernameAvailable && isPasswordStrong && isPasswordConfirmed);
-    }
-
-    // Real-time username checking with debounce
-    usernameInput.addEventListener("input", function() {
-      const username = this.value.toLowerCase().trim();
-      document.getElementById("usernameError").textContent = "";
-      
-      clearTimeout(usernameCheckTimeout);
-      
-      if (username.length >= 3) {
-        usernameCheckTimeout = setTimeout(() => {
-          checkUsernameAvailability(username);
-        }, 500);
-      } else {
-        hideUsernamePreview();
-      }
-    });
-
-    // Load states and cities data
-    // Fallback states if API fails
-    const fallbackStates = ["California", "Texas", "Florida", "New York", "Illinois", "Pennsylvania", "Ohio", "Georgia", "North Carolina", "Michigan"];
+    const fullUsername = username + "@xzedesen.com";
     
     try {
-      fetch("https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/states.json")
-        .then(res => {
-          if (!res.ok) throw new Error('Network response was not ok');
-          return res.json();
-        })
-        .then(data => {
-          // Filter for US states
-          const usStates = data.filter(state => state.country_code === "US");
-          
-          if (usStates.length > 0) {
-            usStates.forEach(state => {
-              let opt = document.createElement("option");
-              opt.value = state.name; 
-              opt.textContent = state.name;
-              stateSelect.appendChild(opt);
-            });
-          } else {
-            // Use fallback if no states found
-            loadFallbackStates();
-          }
-        })
-        .catch(err => {
-          console.error("Error loading states data:", err);
-          loadFallbackStates();
-        });
+      const refDoc = doc(db, "users", fullUsername);
+      const snap = await getDoc(refDoc);
+      
+      if (snap.exists()) {
+        showUsernameTaken(fullUsername);
+      } else {
+        showUsernameAvailable(fullUsername);
+      }
     } catch (err) {
-      console.error("Error fetching states:", err);
-      loadFallbackStates();
+      showUsernameError("Error checking username availability");
     }
+  }
 
-    function loadFallbackStates() {
-      fallbackStates.forEach(state => {
+  function showCheckingStatus() {
+    usernamePreview.innerHTML = `
+      <div class="availability-status">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>Checking username availability...</span>
+      </div>
+    `;
+    usernamePreview.className = "username-preview username-checking";
+    usernamePreview.style.display = "block";
+    isUsernameAvailable = false;
+    updateSubmitButton();
+  }
+
+  function showUsernameAvailable(fullUsername) {
+    usernamePreview.innerHTML = `
+      <div class="availability-status">
+        <i class="fas fa-check-circle"></i>
+        <span>Your username is <strong>${fullUsername}</strong></span>
+      </div>
+    `;
+    usernamePreview.className = "username-preview username-available";
+    usernamePreview.style.display = "block";
+    isUsernameAvailable = true;
+    updateSubmitButton();
+  }
+
+  function showUsernameTaken(fullUsername) {
+    usernamePreview.innerHTML = `
+      <div class="availability-status">
+        <i class="fas fa-times-circle"></i>
+        <span>Username already taken! <strong>${fullUsername}</strong> is not available</span>
+      </div>
+    `;
+    usernamePreview.className = "username-preview username-taken";
+    usernamePreview.style.display = "block";
+    isUsernameAvailable = false;
+    updateSubmitButton();
+  }
+
+  function showUsernameError(error) {
+    usernamePreview.innerHTML = `
+      <div class="availability-status">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>${error}</span>
+      </div>
+    `;
+    usernamePreview.className = "username-preview username-taken";
+    usernamePreview.style.display = "block";
+    isUsernameAvailable = false;
+    updateSubmitButton();
+  }
+
+  function hideUsernamePreview() {
+    usernamePreview.style.display = "none";
+    isUsernameAvailable = false;
+    updateSubmitButton();
+  }
+
+  function updateSubmitButton() {
+    submitBtn.disabled = !(isUsernameAvailable && isPasswordStrong && isPasswordConfirmed);
+  }
+
+  usernameInput.addEventListener("input", function() {
+    const username = this.value.toLowerCase().trim();
+    document.getElementById("usernameError").textContent = "";
+    
+    clearTimeout(usernameCheckTimeout);
+    
+    if (username.length >= 3) {
+      usernameCheckTimeout = setTimeout(() => {
+        checkUsernameAvailability(username);
+      }, 500);
+    } else {
+      hideUsernamePreview();
+    }
+  });
+
+  // 🔥 Load Indian States
+  fetch("https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/states.json")
+    .then(res => res.json())
+    .then(data => {
+      const indiaStates = data.filter(state => state.country_code === "IN");
+      indiaStates.forEach(state => {
         let opt = document.createElement("option");
-        opt.value = state; 
-        opt.textContent = state;
+        opt.value = state.name;
+        opt.textContent = state.name;
         stateSelect.appendChild(opt);
       });
+    })
+    .catch(err => console.error("Error loading states:", err));
+
+  // 🔥 Load Cities based on selected State
+  stateSelect.addEventListener("change", () => {
+    citySelect.innerHTML = "<option value=''>Select city</option>";
+    if (stateSelect.value) {
+      fetch("https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/cities.json")
+        .then(res => res.json())
+        .then(data => {
+          const stateCities = data.filter(city => city.state_name === stateSelect.value);
+          stateCities.forEach(city => {
+            let opt = document.createElement("option");
+            opt.value = city.name;
+            opt.textContent = city.name;
+            citySelect.appendChild(opt);
+          });
+          cityGroup.style.display = "block";
+        })
+        .catch(err => console.error("Error loading cities:", err));
+    } else {
+      cityGroup.style.display = "none";
     }
+  });
 
-    stateSelect.addEventListener("change", () => {
-      citySelect.innerHTML = "<option value=''>Select city</option>";
-      if (stateSelect.value) {
-        // For demo purposes, adding some sample cities based on state
-        const stateCities = {
-          "California": ["Los Angeles", "San Francisco", "San Diego", "Sacramento", "San Jose"],
-          "Texas": ["Houston", "Dallas", "Austin", "San Antonio", "El Paso"],
-          "Florida": ["Miami", "Orlando", "Tampa", "Jacksonville", "Tallahassee"],
-          "New York": ["New York City", "Buffalo", "Rochester", "Albany", "Syracuse"],
-          "Illinois": ["Chicago", "Springfield", "Peoria", "Rockford", "Naperville"]
-        };
-        
-        const cities = stateCities[stateSelect.value] || ["City 1", "City 2", "City 3"];
-        cities.forEach(city => {
-          let opt = document.createElement("option");
-          opt.value = city; 
-          opt.textContent = city;
-          citySelect.appendChild(opt);
-        });
-        
-        let otherOpt = document.createElement("option");
-        otherOpt.value = "Other"; 
-        otherOpt.textContent = "Other";
-        citySelect.appendChild(otherOpt);
-        cityGroup.style.display = "block";
-      } else {
-        cityGroup.style.display = "none";
-      }
-    });
+  // Gender handling
+  document.getElementById("gender").addEventListener("change", e => {
+    document.getElementById("otherGenderBox").style.display = 
+      e.target.value === "Other" ? "block" : "none";
+  });
 
-    // Gender handling
-    document.getElementById("gender").addEventListener("change", e => {
-      document.getElementById("otherGenderBox").style.display = 
-        e.target.value === "Other" ? "block" : "none";
-    });
+  function validateUsername(u){
+    if(u.length < 5) return "Must be at least 5 characters";
+    if(!/[0-9]/.test(u)) return "Must include at least one number";
+    if(/\s/.test(u)) return "No spaces allowed";
+    if(!/^[a-z0-9.]+$/.test(u)) return "Only letters, numbers & periods allowed";
+    if(u.includes(".com")||u.includes(".net")) return "Invalid username";
+    return "";
+  }
 
-    // Username validation
-    function validateUsername(u){
-      if(u.length < 5) return "Must be at least 5 characters";
-      if(!/[0-9]/.test(u)) return "Must include at least one number";
-      if(/\s/.test(u)) return "No spaces allowed";
-      if(!/^[a-z0-9.]+$/.test(u)) return "Only letters, numbers & periods allowed";
-      if(u.includes(".com")||u.includes(".net")) return "Invalid username";
-      return "";
+  // Form submission
+  document.getElementById("signupForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    
+    if (!isUsernameAvailable) {
+      alert("❌ Please choose an available username first.");
+      return;
     }
+    
+    if (!isPasswordStrong) {
+      alert("❌ Please choose a stronger password.");
+      return;
+    }
+    
+    if (!isPasswordConfirmed) {
+      alert("❌ Passwords do not match.");
+      return;
+    }
+    
+    let username = document.getElementById("username").value.toLowerCase();
+    let fullname = document.getElementById("fullname").value;
+    let password = document.getElementById("password").value;
+    let gender = document.getElementById("gender").value;
+    if(gender === "Other") gender = document.getElementById("otherGenderBox").value;
+    let dob = document.getElementById("dob").value;
+    let state = stateSelect.value;
+    let city = citySelect.value;
 
-    // Form submission
-    document.getElementById("signupForm").addEventListener("submit", async e => {
-      e.preventDefault();
-      
-      // Check if all requirements are met
-      if (!isUsernameAvailable) {
-        alert("❌ Please choose an available username first.");
+    let error = validateUsername(username);
+    if(error){
+      document.getElementById("usernameError").textContent = error;
+      return;
+    }
+    
+    username = username + "@xzedesen.com";
+
+    try {
+      const refDoc = doc(db, "users", username);
+      const snap = await getDoc(refDoc);
+      if(snap.exists()){
+        alert("❌ Username already taken. Please choose another one.");
         return;
       }
       
-      if (!isPasswordStrong) {
-        alert("❌ Please choose a stronger password.");
-        return;
+      // 🔥 Upload photo to Firebase Storage
+      let photoURL = null;
+      if (userPhoto) {
+        const photoRef = ref(storage, `users/${username}/profile.jpg`);
+        await uploadString(photoRef, userPhoto, 'data_url');
+        photoURL = await getDownloadURL(photoRef);
       }
-      
-      if (!isPasswordConfirmed) {
-        alert("❌ Passwords do not match.");
-        return;
-      }
-      
-      // Get form values
-      let username = document.getElementById("username").value.toLowerCase();
-      let fullname = document.getElementById("fullname").value;
-      let password = document.getElementById("password").value;
-      let gender = document.getElementById("gender").value;
-      if(gender === "Other") gender = document.getElementById("otherGenderBox").value;
-      let dob = document.getElementById("dob").value;
-      let state = stateSelect.value;
-      let city = citySelect.value;
 
-      // Final validation
-      let error = validateUsername(username);
-      if(error){
-        document.getElementById("usernameError").textContent = error;
-        return;
-      }
+      // Save to Firestore
+      await setDoc(refDoc, {
+        fullname,
+        password, // ⚠️ Future me hash karna hai
+        gender,
+        dob,
+        state,
+        city,
+        photoURL: photoURL,
+        verified: false,
+        createdAt: new Date().toISOString()
+      });
       
-      username = username + "@xzedesen.com";
+      alert("✅ Submitted for free verification! Wait for admin approval.");
+      
+      e.target.reset();
+      cityGroup.style.display = "none";
+      document.getElementById("otherGenderBox").style.display = "none";
+      hideUsernamePreview();
+      passwordStrength.style.display = "none";
+      photoPreview.style.display = "none";
+      defaultIcon.style.display = "block";
+      userPhoto = null;
+      
+    } catch(err) {
+      console.error("Submission error:", err);
+      alert("❌ Error: " + err.message);
+    }
+  });
 
-      try {
-        const ref = doc(db, "users", username);
-        const snap = await getDoc(ref);
-        if(snap.exists()){
-          alert("❌ Username already taken. Please choose another one.");
-          return;
-        }
-        
-        // Store user data including password and photo
-        await setDoc(ref, {
-          fullname,
-          password, // Note: In a real app, you should hash this before storing
-          gender,
-          dob,
-          state,
-          city,
-          photo: userPhoto || null,
-          verified: false,
-          createdAt: new Date().toISOString()
-        });
-        
-        alert("✅ Submitted for free verification! Wait for admin approval.");
-        
-        // Reset form
-        e.target.reset();
-        cityGroup.style.display = "none";
-        document.getElementById("otherGenderBox").style.display = "none";
-        hideUsernamePreview();
-        passwordStrength.style.display = "none";
-        photoPreview.style.display = "none";
-        defaultIcon.style.display = "block";
-        userPhoto = null;
-        
-      } catch(err) {
-        console.error("Submission error:", err);
-        alert("❌ Error: " + err.message);
-      }
-    });
-
-    // Initialize the form
-    window.addEventListener('load', function() {
-      // Ensure the form is properly initialized
-      console.log('Signup form loaded successfully');
-    });
-  </script>
-</body>
-</html>
+  window.addEventListener('load', function() {
+    console.log('Signup form loaded successfully');
+  });
+</script>
