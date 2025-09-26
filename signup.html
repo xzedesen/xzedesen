@@ -322,6 +322,21 @@
       background: rgba(255,255,255,0.1);
       color: white;
     }
+    
+    .permission-help {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #ff8e53;
+      text-align: left;
+      background: rgba(255,255,255,0.05);
+      padding: 10px;
+      border-radius: 8px;
+      display: none;
+    }
+    
+    .permission-help h4 {
+      margin-bottom: 5px;
+    }
 
     /* Username availability styles */
     .username-preview {
@@ -555,6 +570,15 @@
         <button class="camera-btn capture-btn" id="captureBtn">Capture Photo</button>
         <button class="camera-btn close-camera" id="closeCamera">Close</button>
       </div>
+      <div class="permission-help" id="permissionHelp">
+        <h4>Camera Permission Help:</h4>
+        <p><strong>If camera doesn't work:</strong></p>
+        <ul>
+          <li>Make sure you've allowed camera access for this site</li>
+          <li>Close any floating apps/bubbles that might block the camera</li>
+          <li>Try refreshing the page and allowing camera permission when prompted</li>
+        </ul>
+      </div>
     </div>
   </div>
 
@@ -598,6 +622,7 @@
     const cameraCanvas = document.getElementById("cameraCanvas");
     const captureBtn = document.getElementById("captureBtn");
     const closeCamera = document.getElementById("closeCamera");
+    const permissionHelp = document.getElementById("permissionHelp");
 
     let usernameCheckTimeout;
     let isUsernameAvailable = false;
@@ -731,9 +756,11 @@
 
     function openCamera() {
       cameraModal.style.display = 'flex';
+      permissionHelp.style.display = 'none';
       
       // Access the camera with iPhone Safari support
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // First try with exact front camera constraint for iPhone Safari
         navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: { exact: "user" } // force front camera on iPhone Safari
@@ -743,29 +770,44 @@
         .then(function(mediaStream) {
           stream = mediaStream;
           cameraVideo.srcObject = stream;
-          cameraVideo.play().catch(err => console.warn("Autoplay issue:", err));
+          return cameraVideo.play();
         })
         .catch(function(err) {
-          console.error("Error accessing camera: ", err);
-          // Try again without exact constraint if it fails
-          navigator.mediaDevices.getUserMedia({ 
+          console.error("Error with front camera: ", err);
+          // If front camera fails, try any camera
+          return navigator.mediaDevices.getUserMedia({ 
             video: true, 
             audio: false 
           })
           .then(function(mediaStream) {
             stream = mediaStream;
             cameraVideo.srcObject = stream;
-            cameraVideo.play().catch(err => console.warn("Autoplay issue:", err));
+            return cameraVideo.play();
           })
           .catch(function(fallbackErr) {
             console.error("Fallback camera access failed: ", fallbackErr);
-            alert("Unable to access camera. Please check permissions and try again.");
-            closeCameraModal();
+            permissionHelp.style.display = 'block';
+            throw fallbackErr;
           });
+        })
+        .catch(function(finalErr) {
+          console.error("All camera access attempts failed: ", finalErr);
+          let errorMessage = "Unable to access camera. ";
+          
+          if (finalErr.name === 'NotAllowedError') {
+            errorMessage += "Please check your camera permissions and try again.";
+          } else if (finalErr.name === 'NotFoundError') {
+            errorMessage += "No camera found on your device.";
+          } else if (finalErr.name === 'NotSupportedError') {
+            errorMessage += "Your browser doesn't support camera access.";
+          } else {
+            errorMessage += "Please try again or use the upload option.";
+          }
+          
+          alert(errorMessage);
         });
       } else {
-        alert("Your browser doesn't support camera access.");
-        closeCameraModal();
+        alert("Your browser doesn't support camera access. Please use the upload option.");
       }
     }
 
@@ -910,79 +952,57 @@
       }
     });
 
-    // Load states and cities data
-    // Fallback states if API fails
-    const fallbackStates = ["California", "Texas", "Florida", "New York", "Illinois", "Pennsylvania", "Ohio", "Georgia", "North Carolina", "Michigan"];
-    
-    try {
-      fetch("https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/states.json")
-        .then(res => {
-          if (!res.ok) throw new Error('Network response was not ok');
-          return res.json();
-        })
-        .then(data => {
-          // Filter for US states
-          const usStates = data.filter(state => state.country_code === "US");
-          
-          if (usStates.length > 0) {
-            usStates.forEach(state => {
-              let opt = document.createElement("option");
-              opt.value = state.name; 
-              opt.textContent = state.name;
-              stateSelect.appendChild(opt);
-            });
-          } else {
-            // Use fallback if no states found
-            loadFallbackStates();
-          }
-        })
-        .catch(err => {
-          console.error("Error loading states data:", err);
-          loadFallbackStates();
-        });
-    } catch (err) {
-      console.error("Error fetching states:", err);
-      loadFallbackStates();
-    }
-
-    function loadFallbackStates() {
-      fallbackStates.forEach(state => {
-        let opt = document.createElement("option");
-        opt.value = state; 
-        opt.textContent = state;
-        stateSelect.appendChild(opt);
-      });
-    }
-
-    stateSelect.addEventListener("change", () => {
-      citySelect.innerHTML = "<option value=''>Select city</option>";
-      if (stateSelect.value) {
-        // For demo purposes, adding some sample cities based on state
-        const stateCities = {
-          "California": ["Los Angeles", "San Francisco", "San Diego", "Sacramento", "San Jose"],
-          "Texas": ["Houston", "Dallas", "Austin", "San Antonio", "El Paso"],
-          "Florida": ["Miami", "Orlando", "Tampa", "Jacksonville", "Tallahassee"],
-          "New York": ["New York City", "Buffalo", "Rochester", "Albany", "Syracuse"],
-          "Illinois": ["Chicago", "Springfield", "Peoria", "Rockford", "Naperville"]
-        };
-        
-        const cities = stateCities[stateSelect.value] || ["City 1", "City 2", "City 3"];
-        cities.forEach(city => {
+    // Load states and cities from local JSON file
+    fetch('./cities.json')
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to load cities data');
+        }
+        return res.json();
+      })
+      .then(data => {
+        // Populate states dropdown
+        Object.keys(data).forEach(state => {
           let opt = document.createElement("option");
-          opt.value = city; 
-          opt.textContent = city;
-          citySelect.appendChild(opt);
+          opt.value = state;
+          opt.textContent = state;
+          stateSelect.appendChild(opt);
+        });
+
+        stateSelect.addEventListener("change", () => {
+          citySelect.innerHTML = "<option value=''>Select city</option>";
+          if (stateSelect.value && data[stateSelect.value]) {
+            // Populate cities based on selected state
+            data[stateSelect.value].forEach(city => {
+              let opt = document.createElement("option");
+              opt.value = city;
+              opt.textContent = city;
+              citySelect.appendChild(opt);
+            });
+            
+            let otherOpt = document.createElement("option");
+            otherOpt.value = "Other"; 
+            otherOpt.textContent = "Other";
+            citySelect.appendChild(otherOpt);
+            cityGroup.style.display = "block";
+          } else {
+            cityGroup.style.display = "none";
+          }
+        });
+      })
+      .catch(err => {
+        console.error("Error loading local cities data:", err);
+        // Fallback if the local file fails
+        const fallbackStates = ["California", "Texas", "Florida", "New York", "Illinois"];
+        fallbackStates.forEach(state => {
+          let opt = document.createElement("option");
+          opt.value = state; 
+          opt.textContent = state;
+          stateSelect.appendChild(opt);
         });
         
-        let otherOpt = document.createElement("option");
-        otherOpt.value = "Other"; 
-        otherOpt.textContent = "Other";
-        citySelect.appendChild(otherOpt);
-        cityGroup.style.display = "block";
-      } else {
-        cityGroup.style.display = "none";
-      }
-    });
+        alert("Error loading location data. Using fallback states.");
+      });
 
     // Gender handling
     document.getElementById("gender").addEventListener("change", e => {
@@ -1080,7 +1100,6 @@
 
     // Initialize the form
     window.addEventListener('load', function() {
-      // Ensure the form is properly initialized
       console.log('Signup form loaded successfully');
     });
   </script>
