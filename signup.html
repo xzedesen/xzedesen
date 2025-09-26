@@ -35,7 +35,7 @@
     .login-container {
       background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);
       border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      width: 100%; max-width: 450px; padding: 40px; text-align: center;
+      width: 100%; max-width: 500px; padding: 40px; text-align: center;
       border: 1px solid rgba(255, 255, 255, 0.1); animation: fadeIn 0.8s ease-out;
     }
     @keyframes fadeIn { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
@@ -51,13 +51,14 @@
     .logo .tagline { color: rgba(255,255,255,0.85); font-size: 1.1rem; }
     .form-group { margin-bottom: 20px; text-align: left; }
     .form-group label { display:block; margin-bottom:8px; font-weight:500; color:rgba(255,255,255,0.9); }
-    .form-group input {
+    .form-group input, .form-group select {
       width:100%; padding:14px; background:rgba(255,255,255,0.07);
       border:1px solid rgba(255,255,255,0.1); border-radius:10px; font-size:15px; color:#fff;
     }
+    .form-group option { color: black; }
     .form-group small { display:block; margin-top:6px; font-size: 13px; }
     .form-group input::placeholder{ color:rgba(255,255,255,0.5); }
-    .form-group input:focus {
+    .form-group input:focus, .form-group select:focus {
       outline:none; background:rgba(255,255,255,0.1); border-color:rgba(255,107,107,0.6);
       box-shadow:0 0 0 3px rgba(255,107,107,0.2);
     }
@@ -98,14 +99,29 @@
         <label for="dob">Date of Birth</label>
         <input type="date" id="dob" required>
       </div>
+
+      <!-- State & City -->
       <div class="form-group">
-        <label for="location">Location</label>
-        <input type="text" id="location" placeholder="Your city" required>
+        <label for="state">State</label>
+        <select id="state" required>
+          <option value="">-- Select State/UT --</option>
+        </select>
       </div>
+
+      <div class="form-group" id="city-group" style="display:none;">
+        <label for="city">City</label>
+        <select id="city">
+          <option value="">-- Select City --</option>
+        </select>
+      </div>
+
+      <input type="text" id="other-location" placeholder="Enter your location" style="display:none; margin-top:10px;">
+
       <div class="form-group">
         <label for="photo">Upload Photo</label>
         <input type="file" id="photo" accept="image/*" required>
       </div>
+
       <button type="submit" class="login-btn">Submit for Verification</button>
     </form>
 
@@ -131,6 +147,46 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage(app);
+
+    let citiesByState = {};
+
+    // ✅ Load states + cities from external JSON file
+    fetch("cities.json")
+      .then(response => response.json())
+      .then(data => {
+        citiesByState = data;
+        const stateDropdown = document.getElementById("state");
+        Object.keys(citiesByState).forEach(state => {
+          const option = document.createElement("option");
+          option.value = state;
+          option.textContent = state;
+          stateDropdown.appendChild(option);
+        });
+      });
+
+    // State change → load cities
+    document.getElementById("state").addEventListener("change", function() {
+      const state = this.value;
+      const cityDropdown = document.getElementById("city");
+      const cityGroup = document.getElementById("city-group");
+      const otherLocation = document.getElementById("other-location");
+
+      cityDropdown.innerHTML = '<option value="">-- Select City --</option>';
+      cityGroup.style.display = "none";
+      otherLocation.style.display = "none";
+
+      if (state === "Other") {
+        otherLocation.style.display = "block";
+      } else if (citiesByState[state]) {
+        citiesByState[state].forEach(city => {
+          const option = document.createElement("option");
+          option.value = city;
+          option.textContent = city;
+          cityDropdown.appendChild(option);
+        });
+        cityGroup.style.display = "block";
+      }
+    });
 
     // Username availability check
     document.getElementById("username").addEventListener("input", async () => {
@@ -161,7 +217,16 @@
       let name = document.getElementById("name").value;
       let gender = document.getElementById("gender").value;
       let dob = document.getElementById("dob").value;
-      let location = document.getElementById("location").value;
+      let state = document.getElementById("state").value;
+      let city = "";
+
+      if (state === "Other") {
+        city = document.getElementById("other-location").value;
+      } else {
+        city = document.getElementById("city").value;
+      }
+
+      let location = state + (city ? ", " + city : "");
       let file = document.getElementById("photo").files[0];
 
       if (!file) {
@@ -170,12 +235,10 @@
       }
 
       try {
-        // Upload photo
         const storageRef = ref(storage, "user_photos/" + username + ".jpg");
         await uploadBytes(storageRef, file);
         const photoURL = await getDownloadURL(storageRef);
 
-        // Save user data
         await setDoc(doc(db, "users", username), {
           name, gender, dob, location,
           photoURL: photoURL,
@@ -186,6 +249,8 @@
         alert("✅ Details submitted with photo! Wait for admin approval.");
         document.getElementById("signupForm").reset();
         document.getElementById("username-status").innerText = "";
+        document.getElementById("city-group").style.display = "none";
+        document.getElementById("other-location").style.display = "none";
       } catch (err) {
         alert("❌ Error: " + err.message);
       }
