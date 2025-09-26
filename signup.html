@@ -55,6 +55,7 @@
       width:100%; padding:14px; background:rgba(255,255,255,0.07);
       border:1px solid rgba(255,255,255,0.1); border-radius:10px; font-size:15px; color:#fff;
     }
+    .form-group small { display:block; margin-top:6px; font-size: 13px; }
     .form-group input::placeholder{ color:rgba(255,255,255,0.5); }
     .form-group input:focus {
       outline:none; background:rgba(255,255,255,0.1); border-color:rgba(255,107,107,0.6);
@@ -83,6 +84,7 @@
       <div class="form-group">
         <label for="username">Choose Username</label>
         <input type="text" id="username" placeholder="yourname" required>
+        <small id="username-status"></small>
       </div>
       <div class="form-group">
         <label for="name">Full Name</label>
@@ -114,7 +116,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
     const firebaseConfig = {
@@ -130,10 +132,32 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
+    // Username availability check
+    document.getElementById("username").addEventListener("input", async () => {
+      const rawUsername = document.getElementById("username").value.toLowerCase();
+      if (!rawUsername) {
+        document.getElementById("username-status").innerText = "";
+        return;
+      }
+      const fullUsername = rawUsername + "@xzedesen.com";
+      const userRef = doc(db, "users", fullUsername);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        document.getElementById("username-status").innerText = "❌ Username not available";
+        document.getElementById("username-status").style.color = "red";
+      } else {
+        document.getElementById("username-status").innerText = "✅ Username available";
+        document.getElementById("username-status").style.color = "lightgreen";
+      }
+    });
+
+    // Form submit
     document.getElementById("signupForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      let username = document.getElementById("username").value.toLowerCase() + "@xzedesen.com";
+      let rawUsername = document.getElementById("username").value.toLowerCase();
+      let username = rawUsername + "@xzedesen.com";
       let name = document.getElementById("name").value;
       let gender = document.getElementById("gender").value;
       let dob = document.getElementById("dob").value;
@@ -161,6 +185,7 @@
 
         alert("✅ Details submitted with photo! Wait for admin approval.");
         document.getElementById("signupForm").reset();
+        document.getElementById("username-status").innerText = "";
       } catch (err) {
         alert("❌ Error: " + err.message);
       }
