@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Xzedesen</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(30, 30, 50, 0.95);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,107,107,0.3);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .admin-info {
+            text-align: right;
+        }
+
+        .admin-welcome {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .logout-btn {
+            background: rgba(255,107,107,0.2);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .pending-users {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .user-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .user-card:hover {
+            border-color: #ff6b6b;
+            transform: translateY(-2px);
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .user-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .user-username {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+
+        .user-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .user-detail {
+            font-size: 0.9rem;
+        }
+
+        .user-detail strong {
+            color: #ff8e53;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-accept {
+            background: linear-gradient(45deg, #4ecdc4, #42b883);
+            color: white;
+        }
+
+        .btn-reject {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+        }
+
+        .btn-view {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading-spinner {
+            font-size: 2rem;
+            color: #4ecdc4;
+            margin-bottom: 15px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #ff8e53;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .admin-info {
+                text-align: center;
+            }
+            
+            .user-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .action-buttons {
+                width: 100%;
+            }
+            
+            .btn {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Xzedesen Admin</div>
+            <div class="admin-info">
+                <div class="admin-welcome" id="adminWelcome">Welcome, Admin!</div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingUsers">0</div>
+                <div class="stat-label">Pending Verification</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="verifiedUsers">0</div>
+                <div class="stat-label">Verified Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="rejectedUsers">0</div>
+                <div class="stat-label">Rejected Users</div>
+            </div>
+        </div>
+
+        <div class="pending-users">
+            <h2 class="section-title">
+                <i class="fas fa-clock"></i> Pending Verification Requests
+            </h2>
+            
+            <div id="loading" class="loading">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <p>Loading verification requests...</p>
+            </div>
+
+            <div id="userList" class="user-list" style="display: none;">
+                <!-- User cards will be dynamically inserted here -->
+            </div>
+
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <i class="fas fa-check-circle"></i>
+                <h3>No pending verification requests</h3>
+                <p>All users have been processed.</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEBKGAsMF8woHBpOY5OK4isHGA_anAEPs",
+            authDomain: "xzedesen-916ea.firebaseapp.com",
+            projectId: "xzedesen-916ea",
+            storageBucket: "xzedesen-916ea.firebasestorage.app",
+            messagingSenderId: "1019829731381",
+            appId: "1:1019829731381:web:e987812821dd660578317c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // DOM elements
+        const adminWelcome = document.getElementById('adminWelcome');
+        const totalUsersEl = document.getElementById('totalUsers');
+        const pendingUsersEl = document.getElementById('pendingUsers');
+        const verifiedUsersEl = document.getElementById('verifiedUsers');
+        const rejectedUsersEl = document.getElementById('rejectedUsers');
+        const loadingEl = document.getElementById('loading');
+        const userListEl = document.getElementById('userList');
+        const emptyStateEl = document.getElementById('emptyState');
+
+        // Check if user is admin
+        function checkAdminAccess() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return false;
+            }
+
+            const userData = JSON.parse(currentUser);
+            if (!userData.isAdmin) {
+                window.location.href = 'index.html';
+                return false;
+            }
+
+            adminWelcome.textContent = `Welcome, ${userData.fullname || 'Admin'}!`;
+            return true;
+        }
+
+        // Fetch all users and display statistics
+        async function fetchUsers() {
+            if (!checkAdminAccess()) return;
+
+            try {
+                const usersRef = collection(db, "users");
+                const querySnapshot = await getDocs(usersRef);
+                
+                let totalUsers = 0;
+                let pendingUsers = 0;
+                let verifiedUsers = 0;
+                let rejectedUsers = 0;
+                const pendingUsersList = [];
+
+                querySnapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    totalUsers++;
+
+                    if (userData.isAdmin) return; // Skip admin users
+
+                    if (userData.verified === true) {
+                        verifiedUsers++;
+                    } else if (userData.rejected === true) {
+                        rejectedUsers++;
+                    } else {
+                        pendingUsers++;
+                        pendingUsersList.push({
+                            id: doc.id,
+                            ...userData
+                        });
+                    }
+                });
+
+                // Update statistics
+                totalUsersEl.textContent = totalUsers;
+                pendingUsersEl.textContent = pendingUsers;
+                verifiedUsersEl.textContent = verifiedUsers;
+                rejectedUsersEl.textContent = rejectedUsers;
+
+                // Display pending users
+                displayPendingUsers(pendingUsersList);
+
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                alert('Error loading user data: ' + error.message);
+            }
+        }
+
+        // Display pending users in the list
+        function displayPendingUsers(users) {
+            loadingEl.style.display = 'none';
+
+            if (users.length === 0) {
+                emptyStateEl.style.display = 'block';
+                userListEl.style.display = 'none';
+                return;
+            }
+
+            userListEl.style.display = 'grid';
+            emptyStateEl.style.display = 'none';
+
+            userListEl.innerHTML = '';
+
+            users.forEach(user => {
+                const userCard = document.createElement('div');
+                userCard.className = 'user-card';
+                userCard.innerHTML = `
+                    <div class="user-header">
+                        <div>
+                            <div class="user-name">${user.fullname || 'No Name'}</div>
+                            <div class="user-username">${user.id}</div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-view" onclick="viewUserDetails('${user.id}')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn btn-accept" onclick="approveUser('${user.id}')">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button class="btn btn-reject" onclick="rejectUser('${user.id}')">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        </div>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-detail"><strong>Gender:</strong> ${user.gender || 'Not specified'}</div>
+                        <div class="user-detail"><strong>DOB:</strong> ${user.dob || 'Not specified'}</div>
+                        <div class="user-detail"><strong>Location:</strong> ${user.city || ''} ${user.state ? ', ' + user.state : ''}</div>
+                        <div class="user-detail"><strong>Joined:</strong> ${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}</div>
+                    </div>
+                `;
+                userListEl.appendChild(userCard);
+            });
+        }
+
+        // Approve user function
+        window.approveUser = async function(userId) {
+            if (!confirm('Are you sure you want to approve this user?')) return;
+
+            try {
+                const userRef = doc(db, "users", userId);
+                await updateDoc(userRef, {
+                    verified: true,
+                    verifiedAt: new Date().toISOString()
+                });
+
+                alert('User approved successfully!');
+                fetchUsers(); // Refresh the list
+            } catch (error) {
+                console.error('Error approving user:', error);
+                alert('Error approving user: ' + error.message);
+            }
+        };
+
+        // Reject user function
+        window.rejectUser = async function(userId) {
+            if (!confirm('Are you sure you want to reject this user? This action cannot be undone.')) return;
+
+            try {
+                const userRef = doc(db, "users", userId);
+                await updateDoc(userRef, {
+                    rejected: true,
+                    rejectedAt: new Date().toISOString()
+                });
+
+                alert('User rejected successfully!');
+                fetchUsers(); // Refresh the list
+            } catch (error) {
+                console.error('Error rejecting user:', error);
+                alert('Error rejecting user: ' + error.message);
+            }
+        };
+
+        // View user details function
+        window.viewUserDetails = function(userId) {
+            alert('View details for user: ' + userId + '\n\nThis feature can be expanded to show full user details in a modal.');
+        };
+
+        // Logout function
+        window.logout = function() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        };
+
+        // Initialize the admin panel
+        window.addEventListener('load', function() {
+            if (checkAdminAccess()) {
+                fetchUsers();
+            }
+        });
+    </script>
+</body>
+</html>
