@@ -296,7 +296,7 @@
 
         .user-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 20px;
             animation: fadeIn 0.8s ease-out;
         }
@@ -380,19 +380,37 @@
             color: #dc3545;
         }
 
+        .status-admin {
+            background: rgba(0,123,255,0.2);
+            color: #007bff;
+        }
+
+        .status-superadmin {
+            background: rgba(111,66,193,0.2);
+            color: #6f42c1;
+        }
+
         .user-details {
             margin-bottom: 15px;
             font-size: 0.9rem;
             color: rgba(255,255,255,0.8);
         }
 
-        .user-actions {
+        .user-details p {
+            margin-bottom: 5px;
             display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
+            margin-top: 15px;
         }
 
         .action-btn {
-            flex: 1;
             padding: 8px 15px;
             border: none;
             border-radius: 6px;
@@ -403,6 +421,7 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
+            font-size: 0.85rem;
         }
 
         .verify-btn {
@@ -424,6 +443,42 @@
         }
 
         .reject-btn:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .admin-btn {
+            background: rgba(0,123,255,0.2);
+            color: #007bff;
+            border: 1px solid #007bff;
+        }
+
+        .admin-btn:hover {
+            background: #007bff;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .remove-admin-btn {
+            background: rgba(108,117,125,0.2);
+            color: #6c757d;
+            border: 1px solid #6c757d;
+        }
+
+        .remove-admin-btn:hover {
+            background: #6c757d;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .delete-btn {
+            background: rgba(220,53,69,0.2);
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
+        .delete-btn:hover {
             background: #dc3545;
             color: white;
             transform: translateY(-2px);
@@ -531,6 +586,30 @@
             border-left: 4px solid #17a2b8;
         }
 
+        /* Tabs */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            border-bottom: 3px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .tab:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .header {
@@ -550,6 +629,10 @@
             .user-list {
                 grid-template-columns: 1fr;
             }
+            
+            .user-actions {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 480px) {
@@ -563,6 +646,14 @@
             
             .logo {
                 font-size: 2rem;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                text-align: center;
             }
         }
     </style>
@@ -590,7 +681,7 @@
         </div>
 
         <div class="stats-cards">
-            <div class="stat-card" onclick="refreshData()">
+            <div class="stat-card" onclick="showAllUsers()">
                 <div class="stat-number" id="totalUsers">0</div>
                 <div class="stat-label">Total Users</div>
             </div>
@@ -598,17 +689,24 @@
                 <div class="stat-number" id="pendingUsers">0</div>
                 <div class="stat-label">Pending Verification</div>
             </div>
+            <div class="stat-card" onclick="filterAdmins()">
+                <div class="stat-number" id="adminUsers">0</div>
+                <div class="stat-label">Admin Users</div>
+            </div>
             <div class="stat-card" onclick="filterVerified()">
                 <div class="stat-number" id="verifiedUsers">0</div>
                 <div class="stat-label">Verified Users</div>
             </div>
-            <div class="stat-card" onclick="filterRejected()">
-                <div class="stat-number" id="rejectedUsers">0</div>
-                <div class="stat-label">Rejected Users</div>
-            </div>
         </div>
 
-        <div class="pending-users">
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('verification')">Verification Panel</div>
+            <div class="tab" onclick="switchTab('management')">User Management</div>
+        </div>
+
+        <!-- Verification Panel -->
+        <div id="verificationPanel" class="tab-content">
             <h2 class="section-title">
                 <i class="fas fa-users-cog"></i> User Verification Panel
                 <span class="refresh-icon" onclick="refreshData()">
@@ -623,21 +721,41 @@
                 <p>Loading verification requests...</p>
             </div>
 
-            <div id="userList" class="user-list" style="display: none;">
-                <!-- User cards will be dynamically inserted here -->
+            <div id="verificationList" class="user-list" style="display: none;">
+                <!-- Verification user cards will be dynamically inserted here -->
             </div>
 
-            <div id="emptyState" class="empty-state" style="display: none;">
+            <div id="emptyVerification" class="empty-state" style="display: none;">
                 <i class="fas fa-check-circle"></i>
                 <h3>All Clear! 🎉</h3>
                 <p>No pending verification requests at the moment.</p>
+            </div>
+        </div>
+
+        <!-- User Management Panel -->
+        <div id="managementPanel" class="tab-content" style="display: none;">
+            <h2 class="section-title">
+                <i class="fas fa-user-cog"></i> User Management Panel
+                <span class="refresh-icon" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i>
+                </span>
+            </h2>
+
+            <div id="managementList" class="user-list" style="display: none;">
+                <!-- Management user cards will be dynamically inserted here -->
+            </div>
+
+            <div id="emptyManagement" class="empty-state" style="display: none;">
+                <i class="fas fa-users"></i>
+                <h3>No Users Found</h3>
+                <p>There are no users to display.</p>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
         const firebaseConfig = {
@@ -653,14 +771,20 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        // Global variables
+        let currentUser = null;
+        let allUsers = [];
+
         const adminWelcome = document.getElementById('adminWelcome');
         const totalUsersEl = document.getElementById('totalUsers');
         const pendingUsersEl = document.getElementById('pendingUsers');
+        const adminUsersEl = document.getElementById('adminUsers');
         const verifiedUsersEl = document.getElementById('verifiedUsers');
-        const rejectedUsersEl = document.getElementById('rejectedUsers');
         const loadingEl = document.getElementById('loading');
-        const userListEl = document.getElementById('userList');
-        const emptyStateEl = document.getElementById('emptyState');
+        const verificationListEl = document.getElementById('verificationList');
+        const managementListEl = document.getElementById('managementList');
+        const emptyVerificationEl = document.getElementById('emptyVerification');
+        const emptyManagementEl = document.getElementById('emptyManagement');
         const toastEl = document.getElementById('toast');
 
         // Create floating particles
@@ -672,14 +796,12 @@
                 const particle = document.createElement('div');
                 particle.classList.add('particle');
                 
-                // Random size and position
                 const size = Math.random() * 10 + 5;
                 particle.style.width = `${size}px`;
                 particle.style.height = `${size}px`;
                 particle.style.left = `${Math.random() * 100}%`;
                 particle.style.top = `${Math.random() * 100}%`;
                 
-                // Random animation duration and delay
                 particle.style.animationDuration = `${Math.random() * 20 + 10}s`;
                 particle.style.animationDelay = `${Math.random() * 5}s`;
                 
@@ -698,6 +820,22 @@
             }, 3000);
         }
 
+        // Tab switching
+        function switchTab(tabName) {
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            
+            // Update content
+            document.getElementById('verificationPanel').style.display = tabName === 'verification' ? 'block' : 'none';
+            document.getElementById('managementPanel').style.display = tabName === 'management' ? 'block' : 'none';
+            
+            // Refresh the specific tab data
+            if (tabName === 'management') {
+                renderManagementList();
+            }
+        }
+
         // Super Admin check
         function checkAdminAccess() {
             onAuthStateChanged(auth, async (user) => {
@@ -706,6 +844,7 @@
                     return;
                 }
 
+                currentUser = user;
                 const userRef = doc(db, "users", user.uid);
                 const snap = await getDoc(userRef);
 
@@ -727,61 +866,29 @@
             try {
                 const usersRef = collection(db, "users");
                 const querySnapshot = await getDocs(usersRef);
-                let totalUsers = 0, pendingUsers = 0, verifiedUsers = 0, rejectedUsers = 0;
-                let userCards = [];
+                allUsers = [];
+                let totalUsers = 0, pendingUsers = 0, verifiedUsers = 0, adminUsers = 0;
 
                 querySnapshot.forEach((doc) => {
                     const userData = doc.data();
+                    const userWithId = { ...userData, id: doc.id };
+                    allUsers.push(userWithId);
+                    
                     totalUsers++;
                     if (userData.verified) verifiedUsers++;
-                    else if (userData.rejected) rejectedUsers++;
-                    else pendingUsers++;
-
-                    // Create user card HTML
-                    if (!userData.verified && !userData.rejected) {
-                        const statusClass = userData.verified ? 'status-verified' : 
-                                          userData.rejected ? 'status-rejected' : 'status-pending';
-                        const statusText = userData.verified ? 'Verified' : 
-                                         userData.rejected ? 'Rejected' : 'Pending';
-
-                        userCards.push(`
-                            <div class="user-card" data-user-id="${doc.id}">
-                                <div class="user-header">
-                                    <div class="user-name">${userData.fullname || 'Unknown User'}</div>
-                                    <div class="user-status ${statusClass}">${statusText}</div>
-                                </div>
-                                <div class="user-details">
-                                    <p><i class="fas fa-envelope"></i> ${userData.email || 'No email'}</p>
-                                    <p><i class="fas fa-calendar"></i> Joined: ${userData.createdAt ? new Date(userData.createdAt.seconds * 1000).toLocaleDateString() : 'Unknown'}</p>
-                                </div>
-                                <div class="user-actions">
-                                    <button class="action-btn verify-btn" onclick="verifyUser('${doc.id}')">
-                                        <i class="fas fa-check"></i> Verify
-                                    </button>
-                                    <button class="action-btn reject-btn" onclick="rejectUser('${doc.id}')">
-                                        <i class="fas fa-times"></i> Reject
-                                    </button>
-                                </div>
-                            </div>
-                        `);
-                    }
+                    if (userData.role === 'admin' || userData.isAdmin) adminUsers++;
+                    if (!userData.verified && !userData.rejected) pendingUsers++;
                 });
 
-                // Update stats with animation
+                // Update stats
                 animateCounter(totalUsersEl, totalUsers);
                 animateCounter(pendingUsersEl, pendingUsers);
+                animateCounter(adminUsersEl, adminUsers);
                 animateCounter(verifiedUsersEl, verifiedUsers);
-                animateCounter(rejectedUsersEl, rejectedUsers);
 
-                // Show user list or empty state
-                if (userCards.length > 0) {
-                    userListEl.innerHTML = userCards.join('');
-                    userListEl.style.display = 'grid';
-                    emptyStateEl.style.display = 'none';
-                } else {
-                    userListEl.style.display = 'none';
-                    emptyStateEl.style.display = 'block';
-                }
+                // Render lists
+                renderVerificationList();
+                renderManagementList();
                 
                 loadingEl.style.display = 'none';
                 
@@ -789,6 +896,97 @@
                 console.error("Error fetching users:", error);
                 showToast("Error loading user data", "error");
             }
+        }
+
+        // Render verification list
+        function renderVerificationList() {
+            const pendingUsers = allUsers.filter(user => !user.verified && !user.rejected);
+            
+            if (pendingUsers.length > 0) {
+                verificationListEl.innerHTML = pendingUsers.map(user => createUserCard(user, 'verification')).join('');
+                verificationListEl.style.display = 'grid';
+                emptyVerificationEl.style.display = 'none';
+            } else {
+                verificationListEl.style.display = 'none';
+                emptyVerificationEl.style.display = 'block';
+            }
+        }
+
+        // Render management list
+        function renderManagementList() {
+            if (allUsers.length > 0) {
+                managementListEl.innerHTML = allUsers.map(user => createUserCard(user, 'management')).join('');
+                managementListEl.style.display = 'grid';
+                emptyManagementEl.style.display = 'none';
+            } else {
+                managementListEl.style.display = 'none';
+                emptyManagementEl.style.display = 'block';
+            }
+        }
+
+        // Create user card HTML
+        function createUserCard(user, panelType) {
+            const statusClass = user.role === 'superadmin' ? 'status-superadmin' :
+                              user.role === 'admin' || user.isAdmin ? 'status-admin' :
+                              user.verified ? 'status-verified' : 
+                              user.rejected ? 'status-rejected' : 'status-pending';
+            
+            const statusText = user.role === 'superadmin' ? 'Super Admin' :
+                             user.role === 'admin' || user.isAdmin ? 'Admin' :
+                             user.verified ? 'Verified' : 
+                             user.rejected ? 'Rejected' : 'Pending';
+
+            const joinDate = user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'Unknown';
+
+            // Different actions based on panel type
+            let actionsHTML = '';
+            if (panelType === 'verification') {
+                actionsHTML = `
+                    <button class="action-btn verify-btn" onclick="verifyUser('${user.id}')">
+                        <i class="fas fa-check"></i> Verify
+                    </button>
+                    <button class="action-btn reject-btn" onclick="rejectUser('${user.id}')">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                `;
+            } else {
+                // Management panel actions
+                const isAdmin = user.role === 'admin' || user.isAdmin;
+                const isCurrentUser = currentUser && user.id === currentUser.uid;
+                
+                actionsHTML = `
+                    ${!isAdmin ? `
+                    <button class="action-btn admin-btn" onclick="makeAdmin('${user.id}')">
+                        <i class="fas fa-crown"></i> Make Admin
+                    </button>
+                    ` : `
+                    <button class="action-btn remove-admin-btn" onclick="removeAdmin('${user.id}')" ${isCurrentUser ? 'disabled style="opacity:0.5"' : ''}>
+                        <i class="fas fa-crown"></i> Remove Admin
+                    </button>
+                    `}
+                    <button class="action-btn delete-btn" onclick="deleteUser('${user.id}')" ${isCurrentUser ? 'disabled style="opacity:0.5"' : ''}>
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                `;
+            }
+
+            return `
+                <div class="user-card" data-user-id="${user.id}">
+                    <div class="user-header">
+                        <div class="user-name">${user.fullname || 'Unknown User'}</div>
+                        <div class="user-status ${statusClass}">${statusText}</div>
+                    </div>
+                    <div class="user-details">
+                        <p><i class="fas fa-envelope"></i> ${user.email || 'No email'}</p>
+                        <p><i class="fas fa-id-card"></i> UID: ${user.id.substring(0, 8)}...</p>
+                        <p><i class="fas fa-calendar"></i> Joined: ${joinDate}</p>
+                        ${user.role ? `<p><i class="fas fa-user-tag"></i> Role: ${user.role}</p>` : ''}
+                    </div>
+                    <div class="user-actions">
+                        ${actionsHTML}
+                    </div>
+                </div>
+            `;
         }
 
         // Animate counter values
@@ -809,6 +1007,8 @@
 
         // Verify user function
         async function verifyUser(userId) {
+            if (!confirm("Are you sure you want to verify this user?")) return;
+            
             try {
                 const userRef = doc(db, "users", userId);
                 await updateDoc(userRef, {
@@ -817,15 +1017,7 @@
                 });
                 
                 showToast("User verified successfully!", "success");
-                // Add animation to the verified card
-                const userCard = document.querySelector(`[data-user-id="${userId}"]`);
-                if (userCard) {
-                    userCard.style.transform = "scale(0.9)";
-                    userCard.style.opacity = "0.5";
-                    setTimeout(() => {
-                        fetchUsers();
-                    }, 500);
-                }
+                fetchUsers();
             } catch (error) {
                 console.error("Error verifying user:", error);
                 showToast("Error verifying user", "error");
@@ -834,6 +1026,8 @@
 
         // Reject user function
         async function rejectUser(userId) {
+            if (!confirm("Are you sure you want to reject this user?")) return;
+            
             try {
                 const userRef = doc(db, "users", userId);
                 await updateDoc(userRef, {
@@ -842,28 +1036,75 @@
                 });
                 
                 showToast("User rejected successfully!", "success");
-                // Add animation to the rejected card
-                const userCard = document.querySelector(`[data-user-id="${userId}"]`);
-                if (userCard) {
-                    userCard.style.transform = "scale(0.9)";
-                    userCard.style.opacity = "0.5";
-                    setTimeout(() => {
-                        fetchUsers();
-                    }, 500);
-                }
+                fetchUsers();
             } catch (error) {
                 console.error("Error rejecting user:", error);
                 showToast("Error rejecting user", "error");
             }
         }
 
+        // Make user admin function
+        async function makeAdmin(userId) {
+            if (!confirm("Are you sure you want to make this user an admin?")) return;
+            
+            try {
+                const userRef = doc(db, "users", userId);
+                await updateDoc(userRef, {
+                    role: "admin",
+                    isAdmin: true
+                });
+                
+                showToast("User promoted to admin successfully!", "success");
+                fetchUsers();
+            } catch (error) {
+                console.error("Error making user admin:", error);
+                showToast("Error promoting user to admin", "error");
+            }
+        }
+
+        // Remove admin function
+        async function removeAdmin(userId) {
+            if (!confirm("Are you sure you want to remove admin privileges from this user?")) return;
+            
+            try {
+                const userRef = doc(db, "users", userId);
+                await updateDoc(userRef, {
+                    role: "user",
+                    isAdmin: false
+                });
+                
+                showToast("Admin privileges removed successfully!", "success");
+                fetchUsers();
+            } catch (error) {
+                console.error("Error removing admin:", error);
+                showToast("Error removing admin privileges", "error");
+            }
+        }
+
+        // Delete user function
+        async function deleteUser(userId) {
+            if (!confirm("⚠️ WARNING: This will permanently delete the user! Are you sure?")) return;
+            
+            try {
+                const userRef = doc(db, "users", userId);
+                await deleteDoc(userRef);
+                
+                showToast("User deleted successfully!", "success");
+                fetchUsers();
+            } catch (error) {
+                console.error("Error deleting user:", error);
+                showToast("Error deleting user", "error");
+            }
+        }
+
         // Refresh data function
         function refreshData() {
             loadingEl.style.display = 'block';
-            userListEl.style.display = 'none';
-            emptyStateEl.style.display = 'none';
+            verificationListEl.style.display = 'none';
+            managementListEl.style.display = 'none';
+            emptyVerificationEl.style.display = 'none';
+            emptyManagementEl.style.display = 'none';
             
-            // Add refresh animation to the icon
             const refreshIcon = document.querySelector('.refresh-icon');
             refreshIcon.style.transform = 'rotate(360deg)';
             
@@ -873,20 +1114,25 @@
             }, 800);
         }
 
-        // Filter functions (placeholder - would need implementation)
+        // Filter functions
+        function showAllUsers() {
+            switchTab('management');
+            showToast("Showing all users", "info");
+        }
+
         function filterPending() {
+            switchTab('verification');
             showToast("Showing pending users", "info");
-            // Implementation would go here
+        }
+
+        function filterAdmins() {
+            switchTab('management');
+            showToast("Showing admin users", "info");
         }
 
         function filterVerified() {
+            switchTab('management');
             showToast("Showing verified users", "info");
-            // Implementation would go here
-        }
-
-        function filterRejected() {
-            showToast("Showing rejected users", "info");
-            // Implementation would go here
         }
 
         // Logout function
@@ -902,6 +1148,20 @@
                 showToast("Error during logout", "error");
             }
         }
+
+        // Make functions globally available
+        window.verifyUser = verifyUser;
+        window.rejectUser = rejectUser;
+        window.makeAdmin = makeAdmin;
+        window.removeAdmin = removeAdmin;
+        window.deleteUser = deleteUser;
+        window.switchTab = switchTab;
+        window.refreshData = refreshData;
+        window.showAllUsers = showAllUsers;
+        window.filterPending = filterPending;
+        window.filterAdmins = filterAdmins;
+        window.filterVerified = filterVerified;
+        window.logout = logout;
 
         window.addEventListener('load', function() {
             checkAdminAccess();
