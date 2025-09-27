@@ -514,20 +514,11 @@
                     throw new Error('Invalid password. Please try again.');
                 }
                 
-                // Check verification status
-                if (!userData.verified) {
-                    throw new Error('Your account is pending verification. Please wait for admin approval.');
-                }
-                
-                // Login successful
-                loginBtn.innerHTML = '<i class="fas fa-check"></i> ACCESS GRANTED!';
-                loginBtn.style.background = 'linear-gradient(45deg,#4ecdc4,#42b883)';
-                
-                // Store user data in localStorage for welcome page
+                // Login successful - Store ALL user data
                 localStorage.setItem('currentUser', JSON.stringify({
                     fullname: userData.fullname,
                     username: fullUsername,
-                    verified: userData.verified,
+                    verified: userData.verified || false,
                     gender: userData.gender,
                     dob: userData.dob,
                     state: userData.state,
@@ -538,10 +529,14 @@
                 
                 console.log('Login successful, redirecting to welcome page...');
                 
-                // Redirect to welcome page after short delay
+                // Show success message and redirect
+                loginBtn.innerHTML = '<i class="fas fa-check"></i> LOGIN SUCCESSFUL!';
+                loginBtn.style.background = 'linear-gradient(45deg,#4ecdc4,#42b883)';
+                
+                // Redirect to welcome page immediately
                 setTimeout(() => {
                     window.location.href = 'welcome.html';
-                }, 1000);
+                }, 500);
                 
             } catch (error) {
                 console.error('Login error:', error);
@@ -572,6 +567,8 @@
             const storedUser = localStorage.getItem('currentUser');
             if (storedUser) {
                 console.log('User already logged in:', JSON.parse(storedUser));
+                // If already logged in, redirect to welcome page
+                window.location.href = 'welcome.html';
             }
         });
 
