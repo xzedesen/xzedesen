@@ -445,6 +445,7 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -457,103 +458,67 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // DOM elements
         const loginForm = document.getElementById('loginForm');
         const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
         const loginBtn = document.getElementById('loginBtn');
         const loginError = document.getElementById('loginError');
 
-        // Login functionality
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            const username = usernameInput.value.trim();
+
+            const email = usernameInput.value.trim();
             const password = passwordInput.value.trim();
-            
-            if (!username || !password) {
-                if (!username) { 
-                    usernameInput.style.animation = 'shake 0.3s'; 
-                }
-                if (!password) { 
-                    passwordInput.style.animation = 'shake 0.3s'; 
-                }
-                setTimeout(() => { 
-                    usernameInput.style.animation = ''; 
-                    passwordInput.style.animation = ''; 
-                }, 300);
+
+            if (!email || !password) {
+                loginError.textContent = "Please fill both fields";
                 return;
             }
-            
-            // Add @xzedesen.com if not already present
-            const fullUsername = username.includes('@xzedesen.com') ? username : username + '@xzedesen.com';
-            
-            // Update button state
+
             loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AUTHENTICATING...';
             loginBtn.disabled = true;
-            loginError.textContent = '';
-            
+
             try {
-                console.log('Attempting login for:', fullUsername);
-                
-                // Check if user exists in Firestore
-                const userRef = doc(db, "users", fullUsername);
+                // 1️⃣ Login with Firebase Auth
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2️⃣ Fetch extra details from Firestore (using UID)
+                const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
-                
-                if (!userSnap.exists()) {
-                    throw new Error('User not found. Please check your username.');
+
+                let userData = {};
+                if (userSnap.exists()) {
+                    userData = userSnap.data();
                 }
-                
-                const userData = userSnap.data();
-                console.log('User data found:', userData);
-                
-                // Check password
-                if (userData.password !== password) {
-                    throw new Error('Invalid password. Please try again.');
-                }
-                
-                // Login successful - Store ALL user data
+
+                // 3️⃣ Save user info to localStorage
                 localStorage.setItem('currentUser', JSON.stringify({
-                    fullname: userData.fullname,
-                    username: fullUsername,
-                    verified: userData.verified || false,
-                    gender: userData.gender,
-                    dob: userData.dob,
-                    state: userData.state,
-                    city: userData.city,
-                    photo: userData.photo,
-                    createdAt: userData.createdAt
+                    uid: user.uid,
+                    email: user.email,
+                    fullname: userData.fullname || "Unknown",
+                    role: userData.role || "user",
+                    isAdmin: userData.isAdmin || false,
+                    verified: userData.verified || false
                 }));
-                
-                console.log('Login successful, redirecting to welcome page...');
-                
-                // Show success message and redirect
-                loginBtn.innerHTML = '<i class="fas fa-check"></i> LOGIN SUCCESSFUL!';
-                loginBtn.style.background = 'linear-gradient(45deg,#4ecdc4,#42b883)';
-                
-                // Redirect to welcome page immediately
-                setTimeout(() => {
-                    window.location.href = 'welcome.html';
-                }, 500);
-                
+
+                // 4️⃣ Redirect based on role
+                if (userData.role === "superadmin") {
+                    window.location.href = "superadmin.html";
+                } else if (userData.isAdmin) {
+                    window.location.href = "admin.html";
+                } else {
+                    window.location.href = "welcome.html";
+                }
+
             } catch (error) {
-                console.error('Login error:', error);
-                
-                // Show error message
+                console.error(error);
                 loginError.textContent = error.message;
-                
-                // Reset button state
                 loginBtn.innerHTML = 'ACCESS THE VERIFIED REALM';
                 loginBtn.disabled = false;
-                loginBtn.style.background = 'linear-gradient(45deg,#ff6b6b,#ff8e53)';
-                
-                // Shake animation for error
-                loginForm.style.animation = 'shake 0.5s';
-                setTimeout(() => {
-                    loginForm.style.animation = '';
-                }, 500);
             }
         });
 
@@ -567,8 +532,15 @@
             const storedUser = localStorage.getItem('currentUser');
             if (storedUser) {
                 console.log('User already logged in:', JSON.parse(storedUser));
-                // If already logged in, redirect to welcome page
-                window.location.href = 'welcome.html';
+                // If already logged in, redirect to appropriate page
+                const userData = JSON.parse(storedUser);
+                if (userData.role === "superadmin") {
+                    window.location.href = "superadmin.html";
+                } else if (userData.isAdmin) {
+                    window.location.href = "admin.html";
+                } else {
+                    window.location.href = "welcome.html";
+                }
             }
         });
 
