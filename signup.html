@@ -1082,15 +1082,8 @@
         
         alert("✅ Submitted for free verification! Wait for admin approval.");
         
-        // Reset form
-        e.target.reset();
-        cityGroup.style.display = "none";
-        document.getElementById("otherGenderBox").style.display = "none";
-        hideUsernamePreview();
-        passwordStrength.style.display = "none";
-        photoPreview.style.display = "none";
-        defaultIcon.style.display = "block";
-        userPhoto = null;
+        // Redirect to welcome.html after successful submission
+        window.location.href = "welcome.html";
         
       } catch(err) {
         console.error("Submission error:", err);
