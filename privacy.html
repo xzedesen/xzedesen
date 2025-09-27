@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | Xzedesen - Verified Social Network</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #f0f0f0;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(30, 30, 50, 0.95);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,107,107,0.3);
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .last-updated {
+            color: rgba(255,255,255,0.7);
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,107,107,0.2);
+            transform: translateY(-2px);
+        }
+
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #ff6b6b;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 30px;
+            transition: color 0.3s ease;
+        }
+
+        .back-home:hover {
+            color: #ff8e53;
+        }
+
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            font-size: 1.2rem;
+        }
+
+        .subsection {
+            margin: 20px 0;
+            padding-left: 20px;
+            border-left: 2px solid rgba(255,107,107,0.3);
+        }
+
+        .subsection-title {
+            font-size: 1.2rem;
+            color: #ff8e53;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .highlight {
+            background: rgba(255,107,107,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b6b;
+            margin: 20px 0;
+        }
+
+        .contact-info {
+            background: rgba(78, 205, 196, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 30px 0;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .contact-title {
+            color: #4ecdc4;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+
+        .quick-nav {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(30, 30, 50, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: none;
+        }
+
+        .quick-nav-title {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            color: #ff6b6b;
+        }
+
+        .quick-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quick-nav-link {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.3s ease;
+        }
+
+        .quick-nav-link:hover {
+            color: #ff6b6b;
+        }
+
+        @media (min-width: 1200px) {
+            .quick-nav {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        .print-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Xzedesen</div>
+            <h1 class="title">Privacy Policy</h1>
+            <div class="last-updated">Last Updated: December 1, 2023</div>
+            
+            <div class="nav-buttons">
+                <a href="#information-we-collect" class="nav-btn">Information We Collect</a>
+                <a href="#how-we-use" class="nav-btn">How We Use Information</a>
+                <a href="#data-sharing" class="nav-btn">Data Sharing</a>
+                <a href="#user-rights" class="nav-btn">Your Rights</a>
+                <a href="#contact" class="nav-btn">Contact Us</a>
+            </div>
+            
+            <a href="index.html" class="back-home">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-info-circle"></i> Introduction</h2>
+                <p>Welcome to Xzedesen ("we," "our," or "us"). We are committed to protecting your privacy and ensuring transparency in how we handle your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our verified social networking platform.</p>
+                
+                <p>By accessing or using Xzedesen, you agree to the terms of this Privacy Policy. If you do not agree with our policies and practices, please do not use our services.</p>
+                
+                <div class="highlight">
+                    <p><strong>Important:</strong> As a verified social network, we maintain higher standards of data protection and require additional verification information to ensure platform authenticity and security.</p>
+                </div>
+            </div>
+
+            <div class="section" id="information-we-collect">
+                <h2 class="section-title"><i class="fas fa-database"></i> Information We Collect</h2>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title">Personal Information</h3>
+                    <p>We collect the following personal information during registration and account verification:</p>
+                    <ul>
+                        <li><strong>Basic Profile Information:</strong> Full name, username, email address, password</li>
+                        <li><strong>Demographic Information:</strong> Gender, date of birth, location (state and city)</li>
+                        <li><strong>Profile Photo:</strong> Uploaded or captured through your device's camera</li>
+                        <li><strong>Verification Data:</strong> Information required for account verification purposes</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">Automatically Collected Information</h3>
+                    <p>When you use our services, we automatically collect:</p>
+                    <ul>
+                        <li><strong>Device Information:</strong> IP address, browser type, operating system, device type</li>
+                        <li><strong>Usage Data:</strong> Pages visited, features used, time spent on platform</li>
+                        <li><strong>Technical Data:</strong> Cookies, log files, and similar technologies</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">Verification Information</h3>
+                    <p>For platform integrity and verification purposes, we may collect:</p>
+                    <ul>
+                        <li>Government-issued ID information (only for verification, not stored permanently)</li>
+                        <li>Biometric data (optional, for enhanced security features)</li>
+                        <li>Additional documentation required for account verification</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section" id="how-we-use">
+                <h2 class="section-title"><i class="fas fa-cogs"></i> How We Use Your Information</h2>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title">Primary Uses</h3>
+                    <ul>
+                        <li><strong>Account Creation and Management:</strong> To create and maintain your verified account</li>
+                        <li><strong>Platform Security:</strong> To prevent fraud, abuse, and ensure community safety</li>
+                        <li><strong>User Verification:</strong> To maintain our verified user community standards</li>
+                        <li><strong>Communication:</strong> To send important updates, security alerts, and administrative messages</li>
+                        <li><strong>Personalization:</strong> To customize your experience and show relevant content</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">Legal Basis for Processing</h3>
+                    <p>We process your personal information based on:</p>
+                    <ul>
+                        <li><strong>Contractual Necessity:</strong> To provide the services you requested</li>
+                        <li><strong>Legal Obligation:</strong> To comply with applicable laws and regulations</li>
+                        <li><strong>Legitimate Interests:</strong> To improve our services and ensure platform security</li>
+                        <li><strong>Consent:</strong> For specific purposes where we obtain your explicit consent</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section" id="data-sharing">
+                <h2 class="section-title"><i class="fas fa-share-alt"></i> Data Sharing and Disclosure</h2>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title">When We Share Information</h3>
+                    <p>We do not sell your personal information. We may share your information in the following circumstances:</p>
+                    <ul>
+                        <li><strong>With Your Consent:</strong> When you explicitly agree to share specific information</li>
+                        <li><strong>Legal Requirements:</strong> When required by law, court order, or government request</li>
+                        <li><strong>Service Providers:</strong> With trusted partners who help us operate our platform</li>
+                        <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
+                        <li><strong>Safety and Security:</strong> To protect our rights, users, or the public</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">International Data Transfers</h3>
+                    <p>Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place for international data transfers.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-lock"></i> Data Security</h2>
+                
+                <p>We implement comprehensive security measures to protect your information:</p>
+                <ul>
+                    <li><strong>Encryption:</strong> All data is encrypted in transit and at rest</li>
+                    <li><strong>Access Controls:</strong> Strict access controls limit who can view your information</li>
+                    <li><strong>Regular Audits:</strong> Security audits and vulnerability assessments</li>
+                    <li><strong>Employee Training:</strong> Staff training on data protection and privacy</li>
+                    <li><strong>Incident Response:</strong> Procedures for handling data breaches</li>
+                </ul>
+
+                <div class="highlight">
+                    <p><strong>Note:</strong> While we implement robust security measures, no method of transmission over the internet or electronic storage is 100% secure. We cannot guarantee absolute security of your information.</p>
+                </div>
+            </div>
+
+            <div class="section" id="user-rights">
+                <h2 class="section-title"><i class="fas fa-user-shield"></i> Your Rights and Choices</h2>
+                
+                <div class="subsection">
+                    <h3 class="subsection-title">Access and Control</h3>
+                    <p>You have the following rights regarding your personal information:</p>
+                    <ul>
+                        <li><strong>Right to Access:</strong> Request a copy of your personal data</li>
+                        <li><strong>Right to Rectification:</strong> Correct inaccurate or incomplete information</li>
+                        <li><strong>Right to Erasure:</strong> Request deletion of your personal data</li>
+                        <li><strong>Right to Restrict Processing:</strong> Limit how we use your information</li>
+                        <li><strong>Right to Data Portability:</strong> Receive your data in a usable format</li>
+                        <li><strong>Right to Object:</strong> Object to certain processing activities</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3 class="subsection-title">Account Settings</h3>
+                    <p>Through your account settings, you can:</p>
+                    <ul>
+                        <li>Update your profile information</li>
+                        <li>Adjust privacy settings</li>
+                        <li>Manage notification preferences</li>
+                        <li>Download your data</li>
+                        <li>Deactivate or delete your account</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-cookie"></i> Cookies and Tracking Technologies</h2>
+                
+                <p>We use cookies and similar technologies to:</p>
+                <ul>
+                    <li>Remember your preferences and settings</li>
+                    <li>Analyze how our services are used</li>
+                    <li>Prevent fraudulent activity</li>
+                    <li>Improve user experience</li>
+                </ul>
+
+                <p>You can control cookies through your browser settings. However, disabling cookies may affect your ability to use certain features of our platform.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-baby"></i> Children's Privacy</h2>
+                
+                <p>Xzedesen is not intended for users under the age of 18. We do not knowingly collect personal information from children under 18. If we become aware that we have collected personal information from a child under 18, we will take steps to delete such information.</p>
+                
+                <p>If you believe we might have any information from or about a child under 18, please contact us immediately.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-clock"></i> Data Retention</h2>
+                
+                <p>We retain your personal information only for as long as necessary to:</p>
+                <ul>
+                    <li>Provide our services to you</li>
+                    <li>Comply with legal obligations</li>
+                    <li>Resolve disputes</li>
+                    <li>Enforce our agreements</li>
+                </ul>
+
+                <p>When we no longer need to retain your information, we will securely delete or anonymize it.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-exchange-alt"></i> Third-Party Links and Services</h2>
+                
+                <p>Our platform may contain links to third-party websites or services. This Privacy Policy does not apply to those third-party sites. We encourage you to review the privacy policies of any third-party sites you visit.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-edit"></i> Changes to This Privacy Policy</h2>
+                
+                <p>We may update this Privacy Policy from time to time. When we make changes, we will:</p>
+                <ul>
+                    <li>Update the "Last Updated" date at the top of this policy</li>
+                    <li>Notify you through our platform or via email</li>
+                    <li>Provide a summary of significant changes</li>
+                </ul>
+
+                <p>We encourage you to review this Privacy Policy periodically to stay informed about our information practices.</p>
+            </div>
+
+            <div class="contact-info" id="contact">
+                <h3 class="contact-title"><i class="fas fa-envelope"></i> Contact Us</h3>
+                <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
+                
+                <ul>
+                    <li><strong>Email:</strong> privacy@xzedesen.com</li>
+                    <li><strong>Address:</strong> Data Protection Officer, Xzedesen Inc., 123 Verification Street, Digital City, DC 12345</li>
+                    <li><strong>Response Time:</strong> We aim to respond to all privacy-related inquiries within 48 hours</li>
+                </ul>
+
+                <p>For account-specific issues, please use the support features within the Xzedesen platform.</p>
+            </div>
+
+            <button class="print-btn" onclick="window.print()">
+                <i class="fas fa-print"></i> Print This Policy
+            </button>
+        </div>
+
+        <div class="footer">
+            <p>© 2023 Xzedesen. All rights reserved. | Version 1.0</p>
+            <p>This Privacy Policy is effective as of December 1, 2023.</p>
+        </div>
+    </div>
+
+    <div class="quick-nav">
+        <div class="quick-nav-title">Quick Navigation</div>
+        <div class="quick-nav-links">
+            <a href="#information-we-collect" class="quick-nav-link">Information Collection</a>
+            <a href="#how-we-use" class="quick-nav-link">How We Use Data</a>
+            <a href="#data-sharing" class="quick-nav-link">Data Sharing</a>
+            <a href="#user-rights" class="quick-nav-link">Your Rights</a>
+            <a href="#contact" class="quick-nav-link">Contact</a>
+            <a href="#" class="quick-nav-link">Back to Top</a>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Print functionality
+        function printPolicy() {
+            window.print();
+        }
+
+        // Add last updated date dynamically
+        document.addEventListener('DOMContentLoaded', function() {
+            const lastUpdated = document.querySelector('.last-updated');
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            lastUpdated.textContent = `Last Updated: ${currentDate}`;
+        });
+    </script>
+</body>
+</html>
