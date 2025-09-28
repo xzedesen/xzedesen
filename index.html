@@ -335,7 +335,6 @@
             text-align: center;
         }
         
-        /* Mobile responsiveness */
         @media (max-width: 500px) { 
             .login-container { 
                 padding:25px 20px; 
@@ -370,13 +369,11 @@
             }
         }
         
-        /* Prevent text size adjustment on iOS */
         html {
             -webkit-text-size-adjust: 100%;
             text-size-adjust: 100%;
         }
         
-        /* Shake animation for form validation */
         @keyframes shake { 
             0%,100%{transform:translateX(0);}
             20%,60%{transform:translateX(-8px);}
@@ -470,10 +467,11 @@
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const email = usernameInput.value.trim();
+            const rawUsername = usernameInput.value.trim();
+            const email = rawUsername.includes("@") ? rawUsername : rawUsername + "@xzedesen.com";
             const password = passwordInput.value.trim();
 
-            if (!email || !password) {
+            if (!rawUsername || !password) {
                 loginError.textContent = "Please fill both fields";
                 return;
             }
