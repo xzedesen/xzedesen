@@ -1135,10 +1135,11 @@
             showToast("Showing verified users", "info");
         }
 
-        // Logout function
+        // Logout function - FIXED VERSION
         async function logout() {
             try {
                 await signOut(auth);
+                localStorage.removeItem('currentUser'); // ⚡ YEH LINE ADD KI HAI
                 showToast("Logged out successfully", "success");
                 setTimeout(() => {
                     window.location.href = 'index.html';
