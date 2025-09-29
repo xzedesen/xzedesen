@@ -120,115 +120,196 @@
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
     const firebaseConfig = {
-      apiKey:"AIzaSyDEBKGAsMF8woHBpOY5OK4isHGA_anAEPs",
-      authDomain:"xzedesen-916ea.firebaseapp.com",
-      projectId:"xzedesen-916ea",
-      storageBucket:"xzedesen-916ea.appspot.com",
-      messagingSenderId:"1019829731381",
-      appId:"1:1019829731381:web:e987812821dd660578317c"
+      apiKey: "AIzaSyDEBKGAsMF8woHBpOY5OK4isHGA_anAEPs",
+      authDomain: "xzedesen-916ea.firebaseapp.com",
+      projectId: "xzedesen-916ea",
+      storageBucket: "xzedesen-916ea.appspot.com",
+      messagingSenderId: "1019829731381",
+      appId: "1:1019829731381:web:e987812821dd660578317c"
     };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    const usernameInput=document.getElementById("username");
-    const usernameStatus=document.getElementById("usernameStatus");
-    const signupBtn=document.getElementById("signupBtn");
-    const signupError=document.getElementById("signupError");
-    const stateSel=document.getElementById("state");
-    const citySel=document.getElementById("city");
-    const selfieInput=document.getElementById("selfie");
-    const previewContainer=document.getElementById("previewContainer");
-    const previewImage=document.getElementById("previewImage");
+    const usernameInput = document.getElementById("username");
+    const usernameStatus = document.getElementById("usernameStatus");
+    const signupBtn = document.getElementById("signupBtn");
+    const signupError = document.getElementById("signupError");
+    const passwordInput = document.getElementById("password");
+    const repasswordInput = document.getElementById("repassword");
+    const stateSel = document.getElementById("state");
+    const citySel = document.getElementById("city");
+    const selfieInput = document.getElementById("selfie");
+    const previewContainer = document.getElementById("previewContainer");
+    const previewImage = document.getElementById("previewImage");
 
-    let isUsernameAvailable=false;
+    let isUsernameAvailable = false;
+
+    // Real-time password mismatch check
+    function checkPasswordMatch() {
+      const p = passwordInput.value;
+      const rp = repasswordInput.value;
+      if (p && rp && p !== rp) {
+        signupError.textContent = "Passwords do not match";
+        return false;
+      }
+      signupError.textContent = "";
+      return true;
+    }
 
     // Username check
-    usernameInput.addEventListener("input",async()=>{
-      const uname=usernameInput.value.trim();
-      if(uname.length<3){usernameStatus.textContent="Min 3 chars";return;}
-      const q=query(collection(db,"users"),where("username","==",uname));
-      const snap=await getDocs(q);
-      if(snap.empty){usernameStatus.textContent=`✓ ${uname}@xzedesen.com is available`;isUsernameAvailable=true;}
-      else{usernameStatus.textContent=`✗ ${uname}@xzedesen.com is taken`;isUsernameAvailable=false;}
+    usernameInput.addEventListener("input", async () => {
+      const uname = usernameInput.value.trim();
+      if (uname.length < 3) {
+        usernameStatus.textContent = "Min 3 chars";
+        isUsernameAvailable = false;
+      } else {
+        try {
+          const q = query(collection(db, "users"), where("username", "==", uname));
+          const snap = await getDocs(q);
+          if (snap.empty) {
+            usernameStatus.textContent = `✓ ${uname}@xzedesen.com is available`;
+            isUsernameAvailable = true;
+          } else {
+            usernameStatus.textContent = `✗ ${uname}@xzedesen.com is taken`;
+            isUsernameAvailable = false;
+          }
+        } catch (err) {
+          usernameStatus.textContent = "Error checking username";
+          console.error("Username check error:", err);
+        }
+      }
       updateBtn();
     });
 
-    // Password mismatch
-    function checkPasswordMatch(){
-      const p=document.getElementById("password").value;
-      const rp=document.getElementById("repassword").value;
-      if(rp && p!==rp){signupError.textContent="Passwords do not match";return false;}
-      signupError.textContent="";return true;
-    }
+    // Password inputs real-time check
+    passwordInput.addEventListener("input", checkPasswordMatch);
+    repasswordInput.addEventListener("input", checkPasswordMatch);
 
-    // State-City load from cities.json (on GitHub root)
-    fetch("cities.json").then(r=>r.json()).then(data=>{
-      stateSel.innerHTML='<option value="">Select State</option>';
-      for(const st in data){stateSel.innerHTML+=`<option>${st}</option>`;}
-      stateSel.addEventListener("change",()=>{
-        citySel.innerHTML='<option value="">Select City</option>';
-        if(data[stateSel.value]){
-          data[stateSel.value].forEach(c=>citySel.innerHTML+=`<option>${c}</option>`);
+    // State-City load from cities.json (GitHub raw URL)
+    fetch("https://raw.githubusercontent.com/xzedesen/xzedesen/main/cities.json")
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP error! Status: ${r.status}`);
+        return r.json();
+      })
+      .then(data => {
+        stateSel.innerHTML = '<option value="">Select State</option>';
+        for (const st in data) {
+          stateSel.innerHTML += `<option>${st}</option>`;
         }
+        stateSel.addEventListener("change", () => {
+          citySel.innerHTML = '<option value="">Select City</option>';
+          if (data[stateSel.value]) {
+            data[stateSel.value].forEach(c => citySel.innerHTML += `<option>${c}</option>`);
+          }
+        });
+      })
+      .catch(err => {
+        signupError.textContent = "Failed to load states/cities. Try again.";
+        console.error("Cities fetch error:", err);
       });
-    });
 
     // Photo upload preview
-    document.getElementById("uploadBox").addEventListener("click",()=>selfieInput.click());
-    selfieInput.addEventListener("change",e=>{
-      const f=e.target.files[0];if(!f)return;
-      if(f.size>5*1024*1024){signupError.textContent="Image < 5MB";selfieInput.value="";return;}
-      const r=new FileReader();r.onload=ev=>{previewImage.src=ev.target.result;previewContainer.style.display="block";};r.readAsDataURL(f);
+    document.getElementById("uploadBox").addEventListener("click", () => selfieInput.click());
+    selfieInput.addEventListener("change", e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      if (f.size > 5 * 1024 * 1024) {
+        signupError.textContent = "Image must be less than 5MB";
+        selfieInput.value = "";
+        return;
+      }
+      const r = new FileReader();
+      r.onload = ev => {
+        previewImage.src = ev.target.result;
+        previewContainer.style.display = "block";
+      };
+      r.readAsDataURL(f);
       updateBtn();
     });
 
     // Show/Hide password
-    document.querySelectorAll(".togglePass").forEach(icon=>{
-      icon.addEventListener("click",()=>{
-        const t=document.getElementById(icon.dataset.target);
-        if(t.type==="password"){t.type="text";icon.classList.replace("fa-eye","fa-eye-slash");}
-        else{t.type="password";icon.classList.replace("fa-eye-slash","fa-eye");}
+    document.querySelectorAll(".togglePass").forEach(icon => {
+      icon.addEventListener("click", () => {
+        const t = document.getElementById(icon.dataset.target);
+        if (t.type === "password") {
+          t.type = "text";
+          icon.classList.replace("fa-eye", "fa-eye-slash");
+        } else {
+          t.type = "password";
+          icon.classList.replace("fa-eye-slash", "fa-eye");
+        }
       });
     });
 
     // Enable button
-    function updateBtn(){
-      const uname=usernameInput.value.trim(),p=document.getElementById("password").value,rp=document.getElementById("repassword").value;
-      const f=document.getElementById("fullname").value,g=document.getElementById("gender").value,d=document.getElementById("dob").value;
-      const st=stateSel.value,ct=citySel.value,pic=selfieInput.files[0];
-      signupBtn.disabled=!(uname&&p&&rp&&f&&g&&d&&st&&ct&&pic&&isUsernameAvailable&&checkPasswordMatch());
+    function updateBtn() {
+      const uname = usernameInput.value.trim();
+      const p = passwordInput.value;
+      const rp = repasswordInput.value;
+      const f = document.getElementById("fullname").value;
+      const g = document.getElementById("gender").value;
+      const d = document.getElementById("dob").value;
+      const st = stateSel.value;
+      const ct = citySel.value;
+      const pic = selfieInput.files[0];
+      signupBtn.disabled = !(uname && p && rp && f && g && d && st && ct && pic && isUsernameAvailable && checkPasswordMatch());
     }
-    document.querySelectorAll("input,select").forEach(el=>el.addEventListener("input",updateBtn));
+    document.querySelectorAll("input,select").forEach(el => el.addEventListener("input", updateBtn));
 
     // Submit
-    document.getElementById("signupForm").addEventListener("submit",async e=>{
+    document.getElementById("signupForm").addEventListener("submit", async e => {
       e.preventDefault();
-      if(!checkPasswordMatch()) return;
-      const uname=usernameInput.value.trim();
-      const email=uname+"@xzedesen.com";
-      const pass=document.getElementById("password").value;
-      const fullname=document.getElementById("fullname").value;
-      const dob=document.getElementById("dob").value;
-      const gender=document.getElementById("gender").value;
-      const state=stateSel.value,city=citySel.value;
-      const file=selfieInput.files[0];
-      try{
-        signupBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Creating...';signupBtn.disabled=true;
-        const userCred=await createUserWithEmailAndPassword(auth,email,pass);
-        const uid=userCred.user.uid;
-        const sRef=ref(storage,`users/${uid}/profile.jpg`);
-        await uploadBytes(sRef,file);
-        const photoURL=await getDownloadURL(sRef);
-        await setDoc(doc(db,"users",uid),{username:uname,fullname,dob,gender,state,city,
-          photoURL,email,role:"user",isAdmin:false,verified:false,createdAt:serverTimestamp()});
-        signupBtn.innerHTML='<i class="fas fa-check"></i> Account Created!';
-        setTimeout(()=>window.location.href="welcome.html",1500);
-      }catch(err){
-        signupError.textContent=err.message;
-        signupBtn.innerHTML='<i class="fas fa-user-plus"></i> CREATE VERIFIED ACCOUNT';
-        signupBtn.disabled=false;
+      if (!checkPasswordMatch()) return;
+      const uname = usernameInput.value.trim();
+      const email = uname + "@xzedesen.com";
+      const pass = passwordInput.value;
+      const fullname = document.getElementById("fullname").value;
+      const dob = document.getElementById("dob").value;
+      const gender = document.getElementById("gender").value;
+      const state = stateSel.value;
+      const city = citySel.value;
+      const file = selfieInput.files[0];
+      try {
+        signupBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+        signupBtn.disabled = true;
+        const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+        const uid = userCred.user.uid;
+        const sRef = ref(storage, `users/${uid}/profile.jpg`);
+        await uploadBytes(sRef, file);
+        const photoURL = await getDownloadURL(sRef);
+        await setDoc(doc(db, "users", uid), {
+          username: uname,
+          fullname,
+          dob,
+          gender,
+          state,
+          city,
+          photoURL,
+          email,
+          role: "user",
+          isAdmin: false,
+          verified: false,
+          createdAt: serverTimestamp()
+        });
+        signupBtn.innerHTML = '<i class="fas fa-check"></i> Account Created!';
+        setTimeout(() => window.location.href = "welcome.html", 1500);
+      } catch (err) {
+        let errorMsg = "Error creating account. Please try again.";
+        if (err.code === "auth/email-already-in-use") {
+          errorMsg = "Username already taken. Try another.";
+        } else if (err.code === "auth/weak-password") {
+          errorMsg = "Password too weak. Use 6+ characters.";
+        } else if (err.code === "permission-denied") {
+          errorMsg = "Firestore permission error. Check rules.";
+        } else if (err.code === "auth/invalid-email") {
+          errorMsg = "Invalid email format.";
+        }
+        signupError.textContent = errorMsg;
+        console.error("Signup error:", err);
+        signupBtn.innerHTML = '<i class="fas fa-user-plus"></i> CREATE VERIFIED ACCOUNT';
+        signupBtn.disabled = false;
       }
     });
   </script>
