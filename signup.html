@@ -17,7 +17,6 @@ body{
   background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);
   color:#fff;
   padding:20px;
-  overflow:hidden;
 }
 
 /* ===== MORE BUBBLES ===== */
@@ -236,7 +235,7 @@ const $=id=>document.getElementById(id);
 let usernameOk=false;
 
 /* Load cities */
-fetch("https://raw.githubusercontent.com/xzedesen/xzedesen-site/main/cities.json")
+fetch("https://raw.githubusercontent.com/xzedesen/xzedesen/main/cities.json")
 .then(r=>r.json())
 .then(d=>{
   state.innerHTML='<option value="">Select State</option>';
@@ -334,3 +333,4 @@ form.reset();
 
 </body>
 </html>
+
