@@ -188,7 +188,7 @@
     repasswordInput.addEventListener("input", checkPasswordMatch);
 
     // State-City load from cities.json (GitHub raw URL)
-    fetch("https://raw.githubusercontent.com/xzedesen/xzedesen/main/cities.json")
+    fetch("https://raw.githubusercontent.com/xzedesen/xzedesen-site/main/cities.json")
       .then(r => {
         if (!r.ok) throw new Error(`HTTP error! Status: ${r.status}`);
         return r.json();
@@ -315,3 +315,4 @@
   </script>
 </body>
 </html>
+
