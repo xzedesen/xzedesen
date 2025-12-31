@@ -26,7 +26,7 @@ body{
 }
 
 /* ===== BUBBLES ===== */
-.bg-bubbles{position:fixed;inset:0;z-index:-1;}
+.bg-bubbles{position:fixed;inset:0;z-index:-1;overflow:hidden;}
 .bg-bubbles li{
   position:absolute;
   list-style:none;
@@ -37,15 +37,16 @@ body{
 }
 @keyframes floatUp{
   0%{transform:translateY(0);opacity:1;}
-  100%{transform:translateY(-1400px);opacity:0;}
+  100%{transform:translateY(-1600px);opacity:0;}
 }
 .bg-bubbles li:nth-child(1){left:5%;width:40px;height:40px;animation-duration:18s;}
-.bg-bubbles li:nth-child(2){left:15%;width:70px;height:70px;animation-duration:30s;}
-.bg-bubbles li:nth-child(3){left:30%;width:55px;height:55px;animation-duration:24s;}
-.bg-bubbles li:nth-child(4){left:45%;width:90px;height:90px;animation-duration:34s;}
+.bg-bubbles li:nth-child(2){left:15%;width:70px;height:70px;animation-duration:32s;}
+.bg-bubbles li:nth-child(3){left:28%;width:55px;height:55px;animation-duration:24s;}
+.bg-bubbles li:nth-child(4){left:45%;width:100px;height:100px;animation-duration:38s;}
 .bg-bubbles li:nth-child(5){left:60%;width:60px;height:60px;animation-duration:26s;}
-.bg-bubbles li:nth-child(6){left:75%;width:110px;height:110px;animation-duration:38s;}
+.bg-bubbles li:nth-child(6){left:75%;width:120px;height:120px;animation-duration:42s;}
 .bg-bubbles li:nth-child(7){left:88%;width:50px;height:50px;animation-duration:22s;}
+.bg-bubbles li:nth-child(8){left:95%;width:80px;height:80px;animation-duration:34s;}
 
 /* ===== CARD ===== */
 .box{
@@ -79,11 +80,41 @@ input,select{
   transition:.2s;
 }
 
-/* VALIDATION COLORS */
 .invalid{border-color:#ff4d4d !important;}
 .valid{border-color:#2ecc71 !important;}
 
 input::placeholder{color:rgba(255,255,255,.5);}
+
+/* Password wrapper and eye button */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  padding-right: 45px !important;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 18px;
+  transition: color 0.3s;
+  z-index: 10;
+  display: none;
+}
+
+.eye-icon:hover {
+  color: #ff6b6b;
+}
+
+.password-wrapper:has(input:not(:placeholder-shown)) i {
+  display: block;
+}
 
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 @media(max-width:480px){.row{grid-template-columns:1fr;}}
@@ -108,7 +139,7 @@ input::placeholder{color:rgba(255,255,255,.5);}
   cursor:pointer;
 }
 .upload:hover{border-color:#ff6b6b;}
-.preview{display:none;margin-top:10px;}
+.preview{display:none;margin-top:10px;text-align:center;}
 .preview img{max-width:110px;border-radius:8px;border:2px solid #2ecc71;}
 
 /* Consent */
@@ -145,7 +176,7 @@ button:disabled{opacity:.5;cursor:not-allowed;}
 <body>
 
 <ul class="bg-bubbles">
-<li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+<li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
 </ul>
 
 <div class="box">
@@ -155,58 +186,70 @@ button:disabled{opacity:.5;cursor:not-allowed;}
 <form id="form">
 
 <div class="group">
-<label>Full Name</label>
+<label>Full Name *</label>
 <input id="fullname">
+<div id="fnStatus" class="status"></div>
 </div>
 
 <div class="group">
-<label>Date of Birth</label>
+<label>Date of Birth *</label>
 <input type="date" id="dob">
+<div id="dobStatus" class="status"></div>
 </div>
 
 <div class="group">
-<label>Username</label>
+<label>Username *</label>
 <input id="username">
 <div id="uStatus" class="status"></div>
 </div>
 
 <div class="row">
 <div class="group">
-<label>Password</label>
-<input type="password" id="pass">
+<label>Password *</label>
+<div class="password-wrapper">
+  <input type="password" id="pass">
+  <i class="fas fa-eye eye-icon" id="togglePass"></i>
+</div>
 <div id="pStatus" class="status"></div>
 </div>
 <div class="group">
-<label>Retype Password</label>
-<input type="password" id="repass">
+<label>Retype Password *</label>
+<div class="password-wrapper">
+  <input type="password" id="repass">
+  <i class="fas fa-eye eye-icon" id="toggleRePass"></i>
+</div>
 <div id="rpStatus" class="status"></div>
 </div>
 </div>
 
 <div class="row">
 <div class="group">
-<label>Gender</label>
+<label>Gender *</label>
 <select id="gender">
 <option value="">Select</option>
 <option>Male</option><option>Female</option><option>Other</option>
 </select>
+<div id="gStatus" class="status"></div>
 </div>
 <div class="group">
-<label>State</label>
+<label>State *</label>
 <select id="state"></select>
+<div id="sStatus" class="status"></div>
 </div>
 </div>
 
 <div class="group">
-<label>City</label>
+<label>City *</label>
 <select id="city"></select>
+<div id="cStatus" class="status"></div>
 </div>
 
 <div class="group">
-<label>Profile Photo</label>
+<label>Profile Photo *</label>
 <div class="upload" id="uploadBox">Click to upload</div>
 <input type="file" id="photo" hidden accept="image/*">
 <div class="preview" id="preview"><img id="img"></div>
+<div id="photoStatus" class="status"></div>
 </div>
 
 <div class="consent">
@@ -216,6 +259,7 @@ I agree to visit admin for <b>physical identity verification</b>.<br>
 <small>No Aadhaar / ID number is collected online.</small>
 </span>
 </div>
+<div id="consentStatus" class="status"></div>
 
 <div class="error" id="err"></div>
 
@@ -243,219 +287,405 @@ const app = initializeApp({
 const auth=getAuth(app), db=getFirestore(app), storage=getStorage(app);
 const $=id=>document.getElementById(id);
 const unameRegex=/^[a-zA-Z0-9_]+$/;
-let usernameOk=false;
+
+// Validation states
+let fullNameValid = false;
+let dobValid = false;
+let usernameOk = false;
+let passwordValid = false;
+let passwordMatch = false;
+let genderValid = false;
+let stateValid = false;
+let cityValid = false;
+let photoValid = false;
+let consentValid = false;
+
+/* Eye toggle functionality */
+const togglePass = document.getElementById('togglePass');
+const toggleRePass = document.getElementById('toggleRePass');
+const passInput = document.getElementById('pass');
+const repassInput = document.getElementById('repass');
+
+function togglePasswordVisibility(inputElement, iconElement) {
+  if (inputElement.type === 'password') {
+    inputElement.type = 'text';
+    iconElement.classList.remove('fa-eye');
+    iconElement.classList.add('fa-eye-slash');
+  } else {
+    inputElement.type = 'password';
+    iconElement.classList.remove('fa-eye-slash');
+    iconElement.classList.add('fa-eye');
+  }
+}
+
+togglePass.addEventListener('click', () => {
+  togglePasswordVisibility(passInput, togglePass);
+});
+
+toggleRePass.addEventListener('click', () => {
+  togglePasswordVisibility(repassInput, toggleRePass);
+});
 
 /* Cities */
 fetch("https://raw.githubusercontent.com/xzedesen/xzedesen/main/cities.json")
 .then(r=>r.json()).then(d=>{
   state.innerHTML='<option value="">Select State</option>';
   for(const s in d) state.innerHTML+=`<option>${s}</option>`;
-  state.onchange=()=>{city.innerHTML='<option value="">Select City</option>';d[state.value]?.forEach(c=>city.innerHTML+=`<option>${c}</option>`);}
+  state.onchange=()=>{
+    city.innerHTML='<option value="">Select City</option>';
+    d[state.value]?.forEach(c=>city.innerHTML+=`<option>${c}</option>`);
+    validateState();
+    validateCity();
+  };
 });
 
-/* Helper */
-function mark(el, ok){
+/* Helper functions */
+function mark(el, ok, message = ''){
   el.classList.remove("valid","invalid");
   el.classList.add(ok?"valid":"invalid");
+  return message;
 }
 
-/* DOB validation */
-dob.oninput=()=>{dob.value?mark(dob,true):mark(dob,false);validate();};
-
-/* Auto username */
-async function suggest(){
-  if(!fullname.value || !dob.value) return;
-  const year=dob.value.split("-")[0];
-  let base=fullname.value.toLowerCase().replace(/\s+/g,'')+year;
-  let final=base,i=0;
-  while(true){
-    const q=query(collection(db,"users"),where("username","==",final));
-    if((await getDocs(q)).empty) break;
-    i++; final=base+"_"+i;
+function updateStatus(elementId, isValid, message, isError = true) {
+  const statusElement = $(elementId);
+  if (statusElement) {
+    statusElement.textContent = message;
+    statusElement.className = `status ${isError ? 'red' : 'green'}`;
   }
-  username.value=final;
-  usernameOk=true;
-  mark(username,true);
-  uStatus.textContent="✓ Suggested & available";
-  uStatus.className="status green";
+  return isValid;
+}
+
+/* Full Name Validation */
+fullname.addEventListener('blur', validateFullName);
+fullname.addEventListener('input', () => {
+  if (fullname.value.trim()) {
+    validateFullName();
+  }
+});
+
+function validateFullName() {
+  const name = fullname.value.trim();
+  if (!name) {
+    fullNameValid = false;
+    updateStatus('fnStatus', false, "Full name is required");
+    mark(fullname, false);
+  } else if (name.length < 2) {
+    fullNameValid = false;
+    updateStatus('fnStatus', false, "Name must be at least 2 characters");
+    mark(fullname, false);
+  } else {
+    fullNameValid = true;
+    updateStatus('fnStatus', true, "✓ Valid name", false);
+    mark(fullname, true);
+  }
   validate();
 }
-fullname.oninput=suggest; dob.onchange=suggest;
 
-/* Username manual validation */
-username.oninput=async()=>{
-  const u=username.value.trim();
-  if(!u){
-    mark(username,false);
-    usernameOk=false;
-    uStatus.textContent="";
+/* Date of Birth Validation */
+dob.addEventListener('blur', validateDOB);
+dob.addEventListener('change', validateDOB);
+
+function validateDOB() {
+  const dobValue = dob.value;
+  if (!dobValue) {
+    dobValid = false;
+    updateStatus('dobStatus', false, "Date of birth is required");
+    mark(dob, false);
+  } else {
+    const birthDate = new Date(dobValue);
+    const today = new Date();
+    if (birthDate > today) {
+      dobValid = false;
+      updateStatus('dobStatus', false, "Date cannot be in future");
+      mark(dob, false);
+    } else {
+      dobValid = true;
+      updateStatus('dobStatus', true, "✓ Valid date", false);
+      mark(dob, true);
+    }
+  }
+  validate();
+}
+
+/* Username Validation */
+username.addEventListener('blur', validateUsername);
+username.addEventListener('input', validateUsername);
+
+async function validateUsername() {
+  const u = username.value.trim();
+  if (!u) {
+    usernameOk = false;
+    updateStatus('uStatus', false, "Username is required");
+    mark(username, false);
     validate();
     return;
   }
   
-  // Check if alphanumeric (with underscores allowed)
-  if(!unameRegex.test(u)){
-    mark(username,false);
-    uStatus.textContent="Only letters, numbers & _ allowed";
-    uStatus.className="status red";
-    usernameOk=false;
+  if (!unameRegex.test(u)) {
+    usernameOk = false;
+    updateStatus('uStatus', false, "Only letters, numbers & _ allowed");
+    mark(username, false);
     validate();
     return;
   }
   
-  // Check if username exists
-  const q=query(collection(db,"users"),where("username","==",u));
-  const s=await getDocs(q);
+  if (u.length < 3) {
+    usernameOk = false;
+    updateStatus('uStatus', false, "Username must be at least 3 characters");
+    mark(username, false);
+    validate();
+    return;
+  }
+  
+  const q = query(collection(db,"users"),where("username","==",u));
+  const s = await getDocs(q);
   if(s.empty){
-    mark(username,true);
-    uStatus.textContent="✓ Username available";
-    uStatus.className="status green";
-    usernameOk=true;
+    usernameOk = true;
+    updateStatus('uStatus', true, "✓ Username available", false);
+    mark(username, true);
   }else{
-    mark(username,false);
-    uStatus.textContent="✗ Username taken";
-    uStatus.className="status red";
-    usernameOk=false;
+    usernameOk = false;
+    updateStatus('uStatus', false, "✗ Username taken");
+    mark(username, false);
   }
-  validate();
-};
-
-/* Password validation */
-let passwordValid = false;
-let passwordMatch = false;
-
-function validatePassword(){
-  const password = pass.value;
-  const repassword = repass.value;
-  
-  // Basic password validation
-  if(password.length < 6){
-    mark(pass, false);
-    pStatus.textContent = "Password must be at least 6 characters";
-    pStatus.className = "status red";
-    passwordValid = false;
-  } else {
-    mark(pass, true);
-    pStatus.textContent = "✓ Password OK";
-    pStatus.className = "status green";
-    passwordValid = true;
-  }
-  
-  // Check if passwords match
-  if(password && repassword){
-    if(password === repassword){
-      mark(repass, true);
-      rpStatus.textContent = "✓ Passwords match";
-      rpStatus.className = "status green";
-      passwordMatch = true;
-    } else {
-      mark(repass, false);
-      rpStatus.textContent = "✗ Passwords don't match";
-      rpStatus.className = "status red";
-      passwordMatch = false;
-      err.textContent = "Passwords do not match";
-    }
-  } else {
-    // If retype password is empty but password has value
-    if(password && !repassword){
-      mark(repass, false);
-      rpStatus.textContent = "Please retype password";
-      rpStatus.className = "status red";
-      passwordMatch = false;
-    } else if(!password && repassword){
-      mark(pass, false);
-      pStatus.textContent = "Please enter password first";
-      pStatus.className = "status red";
-      passwordValid = false;
-      passwordMatch = false;
-    } else {
-      // Both empty
-      passwordMatch = false;
-      passwordValid = false;
-      pStatus.textContent = "";
-      rpStatus.textContent = "";
-    }
-  }
-  
   validate();
 }
 
-pass.oninput = validatePassword;
-repass.oninput = validatePassword;
+/* Password Validation */
+function validatePassword(){
+  err.textContent="";
 
-/* Upload */
+  // Show/hide eye icons based on input content
+  if (passInput.value) {
+    togglePass.style.display = 'block';
+  } else {
+    togglePass.style.display = 'none';
+  }
+  
+  if (repassInput.value) {
+    toggleRePass.style.display = 'block';
+  } else {
+    toggleRePass.style.display = 'none';
+  }
+
+  if(!passInput.value){
+    passwordValid = false;
+    updateStatus('pStatus', false, "Password is required");
+    mark(passInput, false);
+  }else if(passInput.value.length<6){
+    passwordValid = false;
+    updateStatus('pStatus', false, "Min 6 characters");
+    mark(passInput, false);
+  }else{
+    passwordValid = true;
+    updateStatus('pStatus', true, "✓ Password OK", false);
+    mark(passInput, true);
+  }
+
+  if(!repassInput.value){
+    passwordMatch = false;
+    updateStatus('rpStatus', false, "Please retype password");
+    mark(repassInput, false);
+  }else if(passInput.value && repassInput.value){
+    if(passInput.value===repassInput.value){
+      passwordMatch = true;
+      updateStatus('rpStatus', true, "✓ Passwords match", false);
+      mark(repassInput, true);
+      err.textContent="";
+    }else{
+      passwordMatch = false;
+      updateStatus('rpStatus', false, "✗ Passwords do not match");
+      mark(repassInput, false);
+      err.textContent="Passwords do not match";
+    }
+  }
+  validate();
+}
+passInput.addEventListener('input', validatePassword);
+repassInput.addEventListener('input', validatePassword);
+passInput.addEventListener('blur', validatePassword);
+repassInput.addEventListener('blur', validatePassword);
+
+/* Gender Validation */
+gender.addEventListener('change', validateGender);
+gender.addEventListener('blur', validateGender);
+
+function validateGender() {
+  if (!gender.value) {
+    genderValid = false;
+    updateStatus('gStatus', false, "Please select gender");
+    mark(gender, false);
+  } else {
+    genderValid = true;
+    updateStatus('gStatus', true, "✓ Selected", false);
+    mark(gender, true);
+  }
+  validate();
+}
+
+/* State Validation */
+state.addEventListener('change', validateState);
+state.addEventListener('blur', validateState);
+
+function validateState() {
+  if (!state.value) {
+    stateValid = false;
+    updateStatus('sStatus', false, "Please select state");
+    mark(state, false);
+  } else {
+    stateValid = true;
+    updateStatus('sStatus', true, "✓ Selected", false);
+    mark(state, true);
+  }
+  validate();
+}
+
+/* City Validation */
+city.addEventListener('change', validateCity);
+city.addEventListener('blur', validateCity);
+
+function validateCity() {
+  if (!city.value) {
+    cityValid = false;
+    updateStatus('cStatus', false, "Please select city");
+    mark(city, false);
+  } else {
+    cityValid = true;
+    updateStatus('cStatus', true, "✓ Selected", false);
+    mark(city, true);
+  }
+  validate();
+}
+
+/* Photo Upload Validation */
 uploadBox.onclick=()=>photo.click();
 photo.onchange=e=>{
   const r=new FileReader();
   r.onload=()=>{img.src=r.result;preview.style.display="block";}
   r.readAsDataURL(e.target.files[0]);
-  mark(photo,true);
-  validate();
+  validatePhoto();
 };
 
-/* Generic field validation */
-document.querySelectorAll("input:not([type='password']),select").forEach(el=>{
-  el.addEventListener("blur",()=>{
-    if(el.type === 'file') return;
-    if(el.value){
-      mark(el,true);
+function validatePhoto() {
+  if (!photo.files[0]) {
+    photoValid = false;
+    updateStatus('photoStatus', false, "Profile photo is required");
+  } else {
+    // Check file type
+    const file = photo.files[0];
+    if (!file.type.startsWith('image/')) {
+      photoValid = false;
+      updateStatus('photoStatus', false, "Please upload an image file");
     } else {
-      mark(el,false);
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        photoValid = false;
+        updateStatus('photoStatus', false, "Image must be less than 5MB");
+      } else {
+        photoValid = true;
+        updateStatus('photoStatus', true, "✓ Photo uploaded", false);
+      }
     }
-    validate();
-  });
-});
+  }
+  validate();
+}
 
-/* Final validation */
+/* Consent Validation */
+consent.addEventListener('change', validateConsent);
+
+function validateConsent() {
+  if (!consent.checked) {
+    consentValid = false;
+    updateStatus('consentStatus', false, "You must agree to continue");
+  } else {
+    consentValid = true;
+    updateStatus('consentStatus', true, "✓ Agreed", false);
+  }
+  validate();
+}
+
+/* Final Validation */
 function validate(){
-  btn.disabled=!(
-    fullname.value &&
-    dob.value &&
+  const allValid = (
+    fullNameValid &&
+    dobValid &&
     usernameOk &&
     passwordValid &&
     passwordMatch &&
-    gender.value &&
-    state.value &&
-    city.value &&
-    photo.files[0] &&
-    consent.checked
+    genderValid &&
+    stateValid &&
+    cityValid &&
+    photoValid &&
+    consentValid
   );
+  
+  btn.disabled = !allValid;
+  
+  // Update button text based on validation
+  if (allValid) {
+    btn.style.background = "linear-gradient(45deg,#2ecc71,#27ae60)";
+  } else {
+    btn.style.background = "linear-gradient(45deg,#ff6b6b,#ff8e53)";
+  }
 }
 
 /* Submit */
 form.onsubmit=async e=>{
-e.preventDefault();
-try{
-  const email=username.value+"@xzedesen.com";
-  const cred=await createUserWithEmailAndPassword(auth,email,pass.value);
-  const uid=cred.user.uid;
-  const r=ref(storage,"users/"+uid+"/photo.jpg");
-  await uploadBytes(r,photo.files[0]);
-  const url=await getDownloadURL(r);
-  await setDoc(doc(db,"users",uid),{
-    username:username.value,
-    fullname:fullname.value,
-    dob:dob.value,
-    gender:gender.value,
-    state:state.value,
-    city:city.value,
-    photo:url,
-    verified:false,
-    createdAt:serverTimestamp()
-  });
-  alert("Submitted successfully. Contact admin for verification.");
-  form.reset();
-  // Reset all validation
-  document.querySelectorAll('input, select').forEach(el => {
-    el.classList.remove('valid', 'invalid');
-  });
-  uStatus.textContent = "";
-  pStatus.textContent = "";
-  rpStatus.textContent = "";
-  err.textContent = "";
-  preview.style.display = "none";
-}catch(e){err.textContent=e.message;}
+  e.preventDefault();
+  
+  // Final validation check before submission
+  validateFullName();
+  validateDOB();
+  await validateUsername();
+  validatePassword();
+  validateGender();
+  validateState();
+  validateCity();
+  validatePhoto();
+  validateConsent();
+  
+  if(!fullNameValid || !dobValid || !usernameOk || !passwordValid || !passwordMatch || 
+     !genderValid || !stateValid || !cityValid || !photoValid || !consentValid) {
+    err.textContent = "Please fix all errors before submitting";
+    return;
+  }
+  
+  try {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    
+    const email = username.value + "@xzedesen.com";
+    const cred = await createUserWithEmailAndPassword(auth, email, passInput.value);
+    const uid = cred.user.uid;
+    const r = ref(storage, "users/" + uid + "/photo.jpg");
+    await uploadBytes(r, photo.files[0]);
+    const url = await getDownloadURL(r);
+    await setDoc(doc(db, "users", uid), {
+      username: username.value,
+      fullname: fullname.value,
+      dob: dob.value,
+      gender: gender.value,
+      state: state.value,
+      city: city.value,
+      photo: url,
+      verified: false,
+      createdAt: serverTimestamp()
+    });
+    
+    alert("Submitted successfully. Contact admin for verification.");
+    location.href = "index.html";
+  } catch (error) {
+    console.error("Error:", error);
+    err.textContent = "Error: " + error.message;
+    btn.disabled = false;
+    btn.innerHTML = 'Submit for Verification';
+  }
 };
+
+// Initialize validation on page load
+document.addEventListener('DOMContentLoaded', () => {
+  validate();
+});
 </script>
 
 </body>
