@@ -2,13 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Signup | Xzedesen</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif;}
+
+html,body{
+  width:100%;
+  overflow-x:hidden;
+}
+
 body{
   min-height:100vh;
   display:flex;
@@ -16,54 +22,41 @@ body{
   align-items:center;
   background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);
   color:#fff;
-  padding:20px;
+  padding:16px;
 }
 
-/* ===== MORE BUBBLES ===== */
-.bg-bubbles{
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  z-index:-1;
-}
+/* ===== BUBBLES ===== */
+.bg-bubbles{position:fixed;inset:0;z-index:-1;}
 .bg-bubbles li{
   position:absolute;
   list-style:none;
-  width:40px;height:40px;
-  background:rgba(255,255,255,0.12);
   bottom:-200px;
-  animation:floatUp linear infinite;
+  background:rgba(255,255,255,.12);
   border-radius:50%;
+  animation:floatUp linear infinite;
 }
 @keyframes floatUp{
-  0%{transform:translateY(0) scale(1);opacity:1;}
-  100%{transform:translateY(-1300px) scale(1.3);opacity:0;}
+  0%{transform:translateY(0);opacity:1;}
+  100%{transform:translateY(-1400px);opacity:0;}
 }
-
-/* bubble variations */
-.bg-bubbles li:nth-child(odd){background:rgba(255,255,255,0.08);}
 .bg-bubbles li:nth-child(1){left:5%;width:40px;height:40px;animation-duration:18s;}
-.bg-bubbles li:nth-child(2){left:12%;width:70px;height:70px;animation-duration:25s;}
-.bg-bubbles li:nth-child(3){left:20%;width:55px;height:55px;animation-duration:22s;}
-.bg-bubbles li:nth-child(4){left:30%;width:90px;height:90px;animation-duration:30s;}
-.bg-bubbles li:nth-child(5){left:40%;width:45px;height:45px;animation-duration:20s;}
-.bg-bubbles li:nth-child(6){left:50%;width:100px;height:100px;animation-duration:35s;}
-.bg-bubbles li:nth-child(7){left:60%;width:60px;height:60px;animation-duration:26s;}
-.bg-bubbles li:nth-child(8){left:68%;width:80px;height:80px;animation-duration:28s;}
-.bg-bubbles li:nth-child(9){left:75%;width:50px;height:50px;animation-duration:19s;}
-.bg-bubbles li:nth-child(10){left:82%;width:120px;height:120px;animation-duration:38s;}
-.bg-bubbles li:nth-child(11){left:88%;width:65px;height:65px;animation-duration:24s;}
-.bg-bubbles li:nth-child(12){left:94%;width:45px;height:45px;animation-duration:21s;}
+.bg-bubbles li:nth-child(2){left:15%;width:70px;height:70px;animation-duration:30s;}
+.bg-bubbles li:nth-child(3){left:30%;width:55px;height:55px;animation-duration:24s;}
+.bg-bubbles li:nth-child(4){left:45%;width:90px;height:90px;animation-duration:34s;}
+.bg-bubbles li:nth-child(5){left:60%;width:60px;height:60px;animation-duration:26s;}
+.bg-bubbles li:nth-child(6){left:75%;width:110px;height:110px;animation-duration:38s;}
+.bg-bubbles li:nth-child(7){left:88%;width:50px;height:50px;animation-duration:22s;}
 
-/* ===== FORM ===== */
+/* ===== CARD ===== */
 .box{
   width:100%;
-  max-width:500px;
+  max-width:520px;
   background:rgba(30,30,50,.95);
   border-radius:16px;
-  padding:30px 25px;
+  padding:28px 22px;
   box-shadow:0 15px 40px rgba(0,0,0,.45);
 }
+
 h1{
   text-align:center;
   margin-bottom:6px;
@@ -71,21 +64,42 @@ h1{
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
 }
-p{text-align:center;font-size:14px;opacity:.85;margin-bottom:20px;}
+p{text-align:center;font-size:14px;opacity:.85;margin-bottom:18px;}
 
 .group{margin-bottom:14px;}
 label{display:block;font-size:13px;margin-bottom:6px;}
+
 input,select{
   width:100%;
   padding:13px 15px;
   border-radius:10px;
-  border:1px solid rgba(255,255,255,.2);
+  border:2px solid rgba(255,255,255,.15);
   background:rgba(255,255,255,.08);
   color:#fff;
+  transition:.2s;
 }
-input::placeholder{color:rgba(255,255,255,.5);}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 
+/* VALIDATION COLORS */
+.invalid{border-color:#ff4d4d !important;}
+.valid{border-color:#2ecc71 !important;}
+
+input::placeholder{color:rgba(255,255,255,.5);}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:480px){.row{grid-template-columns:1fr;}}
+
+.status{font-size:12px;margin-top:4px;}
+.status.red{color:#ff4d4d;}
+.status.green{color:#2ecc71;}
+
+.error{
+  font-size:13px;
+  color:#ff4d4d;
+  text-align:center;
+  margin:10px 0;
+}
+
+/* Upload */
 .upload{
   border:2px dashed rgba(255,255,255,.3);
   padding:18px;
@@ -95,14 +109,22 @@ input::placeholder{color:rgba(255,255,255,.5);}
 }
 .upload:hover{border-color:#ff6b6b;}
 .preview{display:none;margin-top:10px;}
-.preview img{max-width:110px;border-radius:8px;border:2px solid #ff6b6b;}
+.preview img{max-width:110px;border-radius:8px;border:2px solid #2ecc71;}
 
-.status{font-size:12px;margin-top:4px;}
-.error{font-size:13px;color:#ff6b6b;text-align:center;margin:10px 0;}
+/* Consent */
+.consent{
+  display:flex;
+  gap:10px;
+  font-size:12px;
+  line-height:1.4;
+  margin-top:12px;
+}
+.consent input{margin-top:3px;}
 
+/* Buttons */
 button{
   width:100%;
-  padding:16px;
+  padding:15px;
   border:none;
   border-radius:12px;
   font-size:16px;
@@ -113,12 +135,9 @@ button{
   margin-top:12px;
 }
 button:disabled{opacity:.5;cursor:not-allowed;}
-
-.consent{
-  font-size:12px;
-  display:flex;
-  gap:8px;
-  margin-top:12px;
+.back{
+  background:none;
+  border:1px solid rgba(255,255,255,.3);
 }
 </style>
 </head>
@@ -126,88 +145,82 @@ button:disabled{opacity:.5;cursor:not-allowed;}
 <body>
 
 <ul class="bg-bubbles">
-<li></li><li></li><li></li><li></li><li></li><li></li>
-<li></li><li></li><li></li><li></li><li></li><li></li>
+<li></li><li></li><li></li><li></li><li></li><li></li><li></li>
 </ul>
 
 <div class="box">
 <h1>Xzedesen</h1>
-<p>Registration request → Physical ID verification by admin</p>
+<p>Fill details → verify physically with admin</p>
 
 <form id="form">
 
-<!-- Full name -->
 <div class="group">
 <label>Full Name</label>
-<input id="fullname" required placeholder="Your full name">
+<input id="fullname">
 </div>
 
-<!-- DOB -->
 <div class="group">
 <label>Date of Birth</label>
-<input type="date" id="dob" required>
+<input type="date" id="dob">
 </div>
 
-<!-- Username -->
 <div class="group">
 <label>Username</label>
-<input id="username" placeholder="Suggested username will appear" required>
+<input id="username">
 <div id="uStatus" class="status"></div>
 </div>
 
-<!-- Passwords -->
 <div class="row">
 <div class="group">
 <label>Password</label>
-<input type="password" id="pass" required minlength="6">
+<input type="password" id="pass">
+<div id="pStatus" class="status"></div>
 </div>
 <div class="group">
 <label>Retype Password</label>
-<input type="password" id="repass" required minlength="6">
+<input type="password" id="repass">
+<div id="rpStatus" class="status"></div>
 </div>
 </div>
 
-<!-- Gender & DOB -->
 <div class="row">
 <div class="group">
 <label>Gender</label>
-<select id="gender" required>
+<select id="gender">
 <option value="">Select</option>
-<option>Male</option>
-<option>Female</option>
-<option>Other</option>
+<option>Male</option><option>Female</option><option>Other</option>
 </select>
 </div>
 <div class="group">
 <label>State</label>
-<select id="state" required></select>
+<select id="state"></select>
 </div>
 </div>
 
 <div class="group">
 <label>City</label>
-<select id="city" required></select>
+<select id="city"></select>
 </div>
 
-<!-- Photo -->
 <div class="group">
 <label>Profile Photo</label>
-<div class="upload" id="uploadBox">Click to upload photo</div>
-<input type="file" id="photo" hidden accept="image/*" required>
+<div class="upload" id="uploadBox">Click to upload</div>
+<input type="file" id="photo" hidden accept="image/*">
 <div class="preview" id="preview"><img id="img"></div>
 </div>
 
-<!-- Consent -->
 <div class="consent">
 <input type="checkbox" id="consent">
 <span>
-I agree to visit the admin for <b>physical identity verification</b> with a valid government photo ID.  
-<br><small>No Aadhaar / ID number is collected online.</small>
+I agree to visit admin for <b>physical identity verification</b>.<br>
+<small>No Aadhaar / ID number is collected online.</small>
 </span>
 </div>
 
 <div class="error" id="err"></div>
+
 <button id="btn" disabled>Submit for Verification</button>
+<button type="button" class="back" onclick="location.href='index.html'">← Back to Login</button>
 
 </form>
 </div>
@@ -227,110 +240,223 @@ const app = initializeApp({
   appId:"1:1019829731381:web:e987812821dd660578317c"
 });
 
-const auth=getAuth(app);
-const db=getFirestore(app);
-const storage=getStorage(app);
+const auth=getAuth(app), db=getFirestore(app), storage=getStorage(app);
 const $=id=>document.getElementById(id);
-
+const unameRegex=/^[a-zA-Z0-9_]+$/;
 let usernameOk=false;
 
-/* Load cities */
+/* Cities */
 fetch("https://raw.githubusercontent.com/xzedesen/xzedesen/main/cities.json")
-.then(r=>r.json())
-.then(d=>{
+.then(r=>r.json()).then(d=>{
   state.innerHTML='<option value="">Select State</option>';
-  for(const s in d){state.innerHTML+=`<option>${s}</option>`;}
+  for(const s in d) state.innerHTML+=`<option>${s}</option>`;
   state.onchange=()=>{city.innerHTML='<option value="">Select City</option>';d[state.value]?.forEach(c=>city.innerHTML+=`<option>${c}</option>`);}
 });
 
-/* Auto-suggest username */
-async function suggestUsername(){
+/* Helper */
+function mark(el, ok){
+  el.classList.remove("valid","invalid");
+  el.classList.add(ok?"valid":"invalid");
+}
+
+/* DOB validation */
+dob.oninput=()=>{dob.value?mark(dob,true):mark(dob,false);validate();};
+
+/* Auto username */
+async function suggest(){
   if(!fullname.value || !dob.value) return;
   const year=dob.value.split("-")[0];
-  const base=fullname.value.toLowerCase().replace(/\s+/g,'')+year;
-  let final=base, i=0;
+  let base=fullname.value.toLowerCase().replace(/\s+/g,'')+year;
+  let final=base,i=0;
   while(true){
     const q=query(collection(db,"users"),where("username","==",final));
-    const s=await getDocs(q);
-    if(s.empty) break;
+    if((await getDocs(q)).empty) break;
     i++; final=base+"_"+i;
   }
   username.value=final;
-  uStatus.textContent="✓ Suggested & available";
-  uStatus.style.color="#4ecdc4";
   usernameOk=true;
-  check();
+  mark(username,true);
+  uStatus.textContent="✓ Suggested & available";
+  uStatus.className="status green";
+  validate();
 }
-fullname.oninput=suggestUsername;
-dob.onchange=suggestUsername;
+fullname.oninput=suggest; dob.onchange=suggest;
 
-/* Manual username check */
+/* Username manual validation */
 username.oninput=async()=>{
   const u=username.value.trim();
-  if(u.length<3){uStatus.textContent="Min 3 characters";uStatus.style.color="orange";usernameOk=false;return;}
+  if(!u){
+    mark(username,false);
+    usernameOk=false;
+    uStatus.textContent="";
+    validate();
+    return;
+  }
+  
+  // Check if alphanumeric (with underscores allowed)
+  if(!unameRegex.test(u)){
+    mark(username,false);
+    uStatus.textContent="Only letters, numbers & _ allowed";
+    uStatus.className="status red";
+    usernameOk=false;
+    validate();
+    return;
+  }
+  
+  // Check if username exists
   const q=query(collection(db,"users"),where("username","==",u));
   const s=await getDocs(q);
-  if(s.empty){uStatus.textContent="✓ Username available";uStatus.style.color="#4ecdc4";usernameOk=true;}
-  else{uStatus.textContent="✗ Username taken";uStatus.style.color="#ff6b6b";usernameOk=false;}
-  check();
+  if(s.empty){
+    mark(username,true);
+    uStatus.textContent="✓ Username available";
+    uStatus.className="status green";
+    usernameOk=true;
+  }else{
+    mark(username,false);
+    uStatus.textContent="✗ Username taken";
+    uStatus.className="status red";
+    usernameOk=false;
+  }
+  validate();
 };
 
-/* Photo */
+/* Password validation */
+let passwordValid = false;
+let passwordMatch = false;
+
+function validatePassword(){
+  const password = pass.value;
+  const repassword = repass.value;
+  
+  // Basic password validation
+  if(password.length < 6){
+    mark(pass, false);
+    pStatus.textContent = "Password must be at least 6 characters";
+    pStatus.className = "status red";
+    passwordValid = false;
+  } else {
+    mark(pass, true);
+    pStatus.textContent = "✓ Password OK";
+    pStatus.className = "status green";
+    passwordValid = true;
+  }
+  
+  // Check if passwords match
+  if(password && repassword){
+    if(password === repassword){
+      mark(repass, true);
+      rpStatus.textContent = "✓ Passwords match";
+      rpStatus.className = "status green";
+      passwordMatch = true;
+    } else {
+      mark(repass, false);
+      rpStatus.textContent = "✗ Passwords don't match";
+      rpStatus.className = "status red";
+      passwordMatch = false;
+      err.textContent = "Passwords do not match";
+    }
+  } else {
+    // If retype password is empty but password has value
+    if(password && !repassword){
+      mark(repass, false);
+      rpStatus.textContent = "Please retype password";
+      rpStatus.className = "status red";
+      passwordMatch = false;
+    } else if(!password && repassword){
+      mark(pass, false);
+      pStatus.textContent = "Please enter password first";
+      pStatus.className = "status red";
+      passwordValid = false;
+      passwordMatch = false;
+    } else {
+      // Both empty
+      passwordMatch = false;
+      passwordValid = false;
+      pStatus.textContent = "";
+      rpStatus.textContent = "";
+    }
+  }
+  
+  validate();
+}
+
+pass.oninput = validatePassword;
+repass.oninput = validatePassword;
+
+/* Upload */
 uploadBox.onclick=()=>photo.click();
 photo.onchange=e=>{
-  const f=e.target.files[0];
   const r=new FileReader();
   r.onload=()=>{img.src=r.result;preview.style.display="block";}
-  r.readAsDataURL(f);
-  check();
+  r.readAsDataURL(e.target.files[0]);
+  mark(photo,true);
+  validate();
 };
 
-document.querySelectorAll("input,select").forEach(e=>e.oninput=check);
+/* Generic field validation */
+document.querySelectorAll("input:not([type='password']),select").forEach(el=>{
+  el.addEventListener("blur",()=>{
+    if(el.type === 'file') return;
+    if(el.value){
+      mark(el,true);
+    } else {
+      mark(el,false);
+    }
+    validate();
+  });
+});
 
-/* Enable button */
-function check(){
-btn.disabled=!(
-fullname.value &&
-dob.value &&
-username.value &&
-usernameOk &&
-pass.value &&
-pass.value===repass.value &&
-gender.value &&
-state.value &&
-city.value &&
-photo.files[0] &&
-consent.checked
-);
+/* Final validation */
+function validate(){
+  btn.disabled=!(
+    fullname.value &&
+    dob.value &&
+    usernameOk &&
+    passwordValid &&
+    passwordMatch &&
+    gender.value &&
+    state.value &&
+    city.value &&
+    photo.files[0] &&
+    consent.checked
+  );
 }
 
 /* Submit */
 form.onsubmit=async e=>{
 e.preventDefault();
 try{
-const email=username.value+"@xzedesen.com";
-const cred=await createUserWithEmailAndPassword(auth,email,pass.value);
-const uid=cred.user.uid;
-const r=ref(storage,"users/"+uid+"/photo.jpg");
-await uploadBytes(r,photo.files[0]);
-const url=await getDownloadURL(r);
-await setDoc(doc(db,"users",uid),{
-username:username.value,
-fullname:fullname.value,
-dob:dob.value,
-gender:gender.value,
-state:state.value,
-city:city.value,
-photo:url,
-verified:false,
-createdAt:serverTimestamp()
-});
-alert("Submitted successfully. Contact admin for verification.");
-form.reset();
-}catch(err){errDiv.textContent=err.message;}
+  const email=username.value+"@xzedesen.com";
+  const cred=await createUserWithEmailAndPassword(auth,email,pass.value);
+  const uid=cred.user.uid;
+  const r=ref(storage,"users/"+uid+"/photo.jpg");
+  await uploadBytes(r,photo.files[0]);
+  const url=await getDownloadURL(r);
+  await setDoc(doc(db,"users",uid),{
+    username:username.value,
+    fullname:fullname.value,
+    dob:dob.value,
+    gender:gender.value,
+    state:state.value,
+    city:city.value,
+    photo:url,
+    verified:false,
+    createdAt:serverTimestamp()
+  });
+  alert("Submitted successfully. Contact admin for verification.");
+  form.reset();
+  // Reset all validation
+  document.querySelectorAll('input, select').forEach(el => {
+    el.classList.remove('valid', 'invalid');
+  });
+  uStatus.textContent = "";
+  pStatus.textContent = "";
+  rpStatus.textContent = "";
+  err.textContent = "";
+  preview.style.display = "none";
+}catch(e){err.textContent=e.message;}
 };
 </script>
 
 </body>
 </html>
-
